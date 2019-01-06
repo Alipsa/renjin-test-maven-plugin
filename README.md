@@ -49,7 +49,9 @@ Example of overriding a few parameters:
     <build>
         <plugins>
             <plugin>
+                <groupId>se.alipsa</groupId>
                 <artifactId>renjin-hamcrest-maven-plugin</artifactId>
+                <version>1.0-SNAPSHOT</version>
                 <configuration>
                     <outputDirectory>target/test-harness/project-to-test</outputDirectory>
                     <testSourceDirectory>R/test</testSourceDirectory>
