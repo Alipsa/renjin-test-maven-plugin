@@ -44,24 +44,10 @@ To use it, build it with `mvn clean install` and then add the plugin to your pom
             <artifactId>hamcrest</artifactId>
             <version>${renjin.version}</version>
           </dependency>
-          <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <version>1.7.25</version>
-          </dependency>
-          <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.25</version>
-          </dependency>
-          <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.25</version>
-          </dependency>
         </dependencies>
       </plugin>
 ````
+Where ${renjin.version} is the version of Renjin you want to use e.g. 0.9.2718
 
 ### Configuration
 - reportOutputDirectory 
@@ -88,6 +74,32 @@ Example of overriding a few parameters:
                     <testSourceDirectory>R/test</testSourceDirectory>
                     <testFailureIgnore>true</testFailureIgnore>
                 </configuration>
+                <executions>
+                  <execution>
+                    <phase>test</phase>
+                    <goals>
+                      <goal>testR</goal>
+                    </goals>
+                  </execution>
+                </executions>
+                <dependencies>
+                  <dependency>
+                    <groupId>org.renjin</groupId>
+                    <artifactId>renjin-script-engine</artifactId>
+                    <version>${renjin.version}</version>
+                    <exclusions>
+                      <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                      </exclusion>
+                    </exclusions>
+                  </dependency>
+                  <dependency>
+                    <groupId>org.renjin</groupId>
+                    <artifactId>hamcrest</artifactId>
+                    <version>${renjin.version}</version>
+                  </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
