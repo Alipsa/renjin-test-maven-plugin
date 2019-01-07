@@ -45,20 +45,6 @@ import java.util.Set;
 )
 public class RenjinHamcrestMojo extends AbstractMojo {
 
-  /*
-  static {
-    System.setProperty("org.apache.commons.logging.simplelog.defaultlog", "warn");
-    java.util.logging.Logger utilLog = java.util.logging.LogManager.getLogManager().getLogger("org.apache.commons.vfs");
-    if (utilLog != null) {
-      utilLog.setLevel(java.util.logging.Level.WARNING);
-    }
-    java.util.logging.Logger utilLog2 = java.util.logging.LogManager.getLogManager().getLogger("org.apache.commons.vfs2");
-    if (utilLog2 != null) {
-      utilLog2.setLevel(java.util.logging.Level.WARNING);
-    }
-  }
-  */
-
   @Parameter(name = "reportOutputDirectory", property = "testR.reportOutputDirectory",
       defaultValue = "${project.build.directory}/renjin-hamcrest-test-reports", required = true)
   private File reportOutputDirectory;
@@ -175,7 +161,7 @@ public class RenjinHamcrestMojo extends AbstractMojo {
           continue;
         }
         String errMsg = formatMessage(result.getError());
-        logger.warn("\t{} : {} : {}",
+        logger.error("\t{} : {} : {}",
             result.getResult(),
             result.issue,
             errMsg);
