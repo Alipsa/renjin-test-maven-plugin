@@ -10,5 +10,5 @@ test.loop <- function() {
     for (i in 1:25) {
       j <- j + (i^2)
     }
-    assertThat(j, identicalTo(234))
+    assertThat(j, identicalTo(5525))
 }

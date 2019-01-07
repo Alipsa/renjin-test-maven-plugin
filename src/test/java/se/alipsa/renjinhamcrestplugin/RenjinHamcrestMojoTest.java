@@ -1,10 +1,15 @@
 package se.alipsa.renjinhamcrestplugin;
 
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.plugin.testing.AbstractMojoTestCase;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuilder;
+import org.apache.maven.project.ProjectBuildingRequest;
 
 import java.io.File;
 
-public class RenjinHamcrestMojoTest extends AbstractMojoTestCase {
+public class RenjinHamcrestMojoTest extends EnhancedAbstractMojoTestCase {
 
   /**
    * {@inheritDoc}
@@ -34,9 +39,8 @@ public class RenjinHamcrestMojoTest extends AbstractMojoTestCase {
     assertNotNull(pom);
     assertTrue(pom.exists());
 
-    //TODO MavenProject is probably not created this way so will not be injected.
-
-    RenjinHamcrestMojo myMojo = (RenjinHamcrestMojo) lookupMojo("testR", pom);
+    //RenjinHamcrestMojo myMojo = (RenjinHamcrestMojo) lookupMojo("testR", pom);
+    RenjinHamcrestMojo myMojo = (RenjinHamcrestMojo) lookupConfiguredMojo(pom, "testR");
     assertNotNull(myMojo);
     myMojo.execute();
   }
