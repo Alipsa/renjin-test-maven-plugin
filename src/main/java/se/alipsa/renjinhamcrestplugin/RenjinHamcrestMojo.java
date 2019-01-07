@@ -2,7 +2,6 @@ package se.alipsa.renjinhamcrestplugin;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.vfs2.FileSystemException;
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -24,16 +23,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptException;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.IOException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Goal which runs Renjin Hamcrest test.
@@ -67,10 +62,10 @@ public class RenjinHamcrestMojo extends AbstractMojo {
   private boolean testFailureIgnore;
 
 
-  Logger logger = LoggerFactory.getLogger(RenjinHamcrestMojo.class);
-  ClassLoader classLoader;
-  String[] extensions = new String[]{"R", "S"};
-  List<TestResult> results;
+  private Logger logger = LoggerFactory.getLogger(RenjinHamcrestMojo.class);
+  private ClassLoader classLoader;
+  private String[] extensions = new String[]{"R", "S"};
+  private List<TestResult> results;
   private RenjinScriptEngineFactory factory;
 
   public void execute() throws MojoExecutionException, MojoFailureException {
@@ -115,26 +110,17 @@ public class RenjinHamcrestMojo extends AbstractMojo {
 
     List<URL> runtimeUrls = new ArrayList<>();
     try {
-      /*
-      for (String element : project.getRuntimeClasspathElements()) {
-        runtimeUrls.add(new File(element).toURI().toURL());
-      }*/
+      // Add classpath from calling pom
       for (String element : project.getTestClasspathElements()) {
         runtimeUrls.add(new File(element).toURI().toURL());
       }
-      runtimeUrls.addAll(asUrls(project.getPluginArtifacts()));
-      /*
-      for (String element : project.getCompileClasspathElements()) {
-        runtimeUrls.add(new File(element).toURI().toURL());
-      }*/
 
     } catch (DependencyResolutionRequiredException | MalformedURLException e) {
       throw new MojoExecutionException("Failed to set up classLoader", e);
     }
-    classLoader = new URLClassLoader(runtimeUrls.toArray(new URL[runtimeUrls.size()]),
+    classLoader = new URLClassLoader(runtimeUrls.toArray(new URL[0]),
         Thread.currentThread().getContextClassLoader());
 
-    //classLoader = Thread.currentThread().getContextClassLoader();
     results = new ArrayList<>();
 
     Collection<File> testFiles = FileUtils.listFiles(testOutputDirectory, extensions, true);
@@ -143,16 +129,22 @@ public class RenjinHamcrestMojo extends AbstractMojo {
       runTestFile(testFile);
     }
 
-    long successes = results.stream().filter(p -> p.getResult().equals(TestResult.OutCome.SUCCESS)).count();
-    long failures = results.stream().filter(p -> p.getResult().equals(TestResult.OutCome.FAILURE)).count();
-    long errors = results.stream().filter(p -> p.getResult().equals(TestResult.OutCome.ERROR)).count();
+    Map<TestResult.OutCome, List<TestResult>> resultMap = results.stream()
+        .collect(Collectors.groupingBy(TestResult::getResult));
+
+    List<TestResult> successResults = resultMap.get(TestResult.OutCome.SUCCESS);
+    List<TestResult> failureResults = resultMap.get(TestResult.OutCome.FAILURE);
+    List<TestResult> errorResults = resultMap.get(TestResult.OutCome.ERROR);
+    long successCount = successResults == null ? 0 : successResults.size();
+    long failCount = failureResults == null ? 0 : failureResults.size();
+    long errorCount = errorResults == null ? 0 : errorResults.size();
     logger.info("");
     logger.info("R tests summary:");
     logger.info("----------------");
     logger.info("{} Files executed, Tests run: {}, Sucesses: {}, Failures: {}, Errors: {}",
-        testFiles.size(), results.size(), successes, failures, errors);
+        testFiles.size(), results.size(), successCount, failCount, errorCount);
 
-    boolean errorsDuringTests = failures > 0 || errors > 0;
+    boolean errorsDuringTests = failCount > 0 || errorCount > 0;
     if (errorsDuringTests) {
       logger.info("");
       logger.info("Results: ");
@@ -189,26 +181,9 @@ public class RenjinHamcrestMojo extends AbstractMojo {
             .orElse(null);
       }
 
-      throw new MojoFailureException("There were " + failures + " failures and " + errors + " errors"
+      throw new MojoFailureException("There were " + failCount + " failures and " + errorCount + " errors"
           , errorResult.error);
     }
-  }
-
-  private List<URL> asUrls(Set<Artifact> pluginArtifacts) {
-    List<URL> list = new ArrayList<>(pluginArtifacts.size());
-    for(Artifact artifact : pluginArtifacts) {
-      if (artifact.isResolved()) {
-        File file = artifact.getFile();
-        if (file != null) {
-          try {
-            list.add(file.toURI().toURL());
-          } catch (MalformedURLException e) {
-            logger.warn("Failed to add file url {}", file, e);
-          }
-        }
-      }
-    }
-    return list;
   }
 
   private String formatMessage(final Throwable error) {
@@ -239,7 +214,6 @@ public class RenjinHamcrestMojo extends AbstractMojo {
     results.add(result);
 
     //now run each testFunction in that file, in the same Session
-    String orgTestName = testName;
     for (Symbol name : session.getGlobalEnvironment().getSymbolNames()) {
       String methodName = name.getPrintName().trim();
       if (methodName.startsWith("test.")) {
