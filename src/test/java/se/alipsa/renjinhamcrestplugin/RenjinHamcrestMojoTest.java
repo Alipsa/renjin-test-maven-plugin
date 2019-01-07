@@ -34,6 +34,8 @@ public class RenjinHamcrestMojoTest extends AbstractMojoTestCase {
     assertNotNull(pom);
     assertTrue(pom.exists());
 
+    //TODO MavenProject is probably not created this way so will not be injected.
+
     RenjinHamcrestMojo myMojo = (RenjinHamcrestMojo) lookupMojo("testR", pom);
     assertNotNull(myMojo);
     myMojo.execute();

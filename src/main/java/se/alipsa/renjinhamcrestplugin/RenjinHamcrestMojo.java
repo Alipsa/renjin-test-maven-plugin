@@ -1,13 +1,13 @@
 package se.alipsa.renjinhamcrestplugin;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.plugins.annotations.ResolutionScope;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugins.annotations.*;
+import org.apache.maven.project.MavenProject;
 import org.renjin.eval.Context;
 import org.renjin.eval.EvalException;
 import org.renjin.eval.Session;
@@ -24,6 +24,9 @@ import org.slf4j.LoggerFactory;
 import javax.script.ScriptException;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -52,31 +55,36 @@ public class RenjinHamcrestMojo extends AbstractMojo {
   }
   */
 
-  Logger logger = LoggerFactory.getLogger(RenjinHamcrestMojo.class);
-  ClassLoader classLoader;
-  String[] extensions = new String[]{"R", "S"};
-  List<TestResult> results;
   @Parameter(name = "outputDirectory", property = "testR.outputDirectory",
       defaultValue = "${project.build.outputDirectory}/renjin-hamcrest-test-reports", required = true)
   private File outputDirectory;
 
-  //@Parameter( defaultValue="${project}", readonly = true, required = true)
-  //private MavenProject project;
+  @Parameter( defaultValue = "${project}", readonly = true )
+  private MavenProject project;
+
   @Parameter(name = "testSourceDirectory", property = "testR.testSourceDirectory",
       defaultValue = "${project.basedir}/src/test/R", required = true)
   private File testSourceDirectory;
+
   @Parameter(name = "skipTests", property = "testR.skipTests", defaultValue = "false")
   private boolean skipTests;
+
   @Parameter(name = "testFailureIgnore", property = "testR.testFailureIgnore", defaultValue = "false")
   private boolean testFailureIgnore;
+
+
+  Logger logger = LoggerFactory.getLogger(RenjinHamcrestMojo.class);
+  ClassLoader classLoader;
+  String[] extensions = new String[]{"R", "S"};
+  List<TestResult> results;
   private RenjinScriptEngineFactory factory;
 
   public void execute() throws MojoExecutionException, MojoFailureException {
 
-    /*
+
     if (project == null) {
       throw new MojoExecutionException("MavenProject is null, cannot continue");
-    }*/
+    }
     if (outputDirectory == null) {
       throw new MojoExecutionException("outputDirectory is null, cannot continue");
     }
@@ -86,7 +94,7 @@ public class RenjinHamcrestMojo extends AbstractMojo {
 
     factory = new RenjinScriptEngineFactory();
 
-    /*
+
     URL[] runtimeUrls = new URL[0];
     try {
       List runtimeClasspathElements = project.getRuntimeClasspathElements();
@@ -100,8 +108,8 @@ public class RenjinHamcrestMojo extends AbstractMojo {
     }
     classLoader = new URLClassLoader(runtimeUrls,
         Thread.currentThread().getContextClassLoader());
-    */
-    classLoader = Thread.currentThread().getContextClassLoader();
+
+    //classLoader = Thread.currentThread().getContextClassLoader();
     results = new ArrayList<>();
 
     logger.info("");
@@ -208,8 +216,8 @@ public class RenjinHamcrestMojo extends AbstractMojo {
   }
 
   private TestResult runTestFunction(final Context context, final File testFile, final Symbol name) {
-    String methodName = name.getPrintName().trim();
-    String testName = testFile + ": " + methodName + "()";
+    String methodName = name.getPrintName().trim() + "()";
+    String testName = testFile + ": " + methodName ;
     logger.info("\t# Running test function {} in {}", methodName, testFile.getName());
     String issue;
     Exception exception;
