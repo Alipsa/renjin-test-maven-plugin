@@ -255,7 +255,7 @@ public class RenjinHamcrestMojo extends AbstractMojo {
 
   private TestResult runTestFunction(final Context context, final File testFile, final Symbol name) {
     String methodName = name.getPrintName().trim() + "()";
-    String testName = testFile + ": " + methodName ;
+    String testName = testFile.getName() + ": " + methodName ;
     logger.info("\t# Running test function {} in {}", methodName, testFile.getName());
     String issue;
     Exception exception;
@@ -286,7 +286,7 @@ public class RenjinHamcrestMojo extends AbstractMojo {
     TestResult result = new TestResult(testFile);
     String issue;
     Exception exception;
-    String testName = testFile.toString();
+    String testName = testFile.getName();
     try {
       engine.eval(testFile);
       result.setResult(TestResult.OutCome.SUCCESS);
@@ -308,7 +308,7 @@ public class RenjinHamcrestMojo extends AbstractMojo {
       exception = e;
       issue = e.getClass().getSimpleName() + " thrown when running script " + testName;
     }
-    logger.info("\t# {}: Failure detected: {}", testName, formatMessage(exception));
+    logger.warn("\t# {}: Failure detected: {}", testName, formatMessage(exception));
     result.setResult(TestResult.OutCome.FAILURE);
     result.setError(exception);
     result.setIssue(issue);
