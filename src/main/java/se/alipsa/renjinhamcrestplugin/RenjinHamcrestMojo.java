@@ -107,7 +107,6 @@ public class RenjinHamcrestMojo extends AbstractMojo {
 
     factory = new RenjinScriptEngineFactory();
 
-
     List<URL> runtimeUrls = new ArrayList<>();
     try {
       // Add classpath from calling pom
@@ -192,9 +191,10 @@ public class RenjinHamcrestMojo extends AbstractMojo {
 
   private void runTestFile(final File testFile) throws MojoExecutionException {
 
-    String testName = testFile.toString();
+
+    String testName = testFile.getAbsolutePath().substring(testOutputDirectory.getAbsolutePath().length() + 1);
     logger.info("");
-    logger.info("# Running test file {}", testName);
+    logger.info("# Running {}", testName);
 
     SessionBuilder builder = new SessionBuilder();
     Session session = builder
