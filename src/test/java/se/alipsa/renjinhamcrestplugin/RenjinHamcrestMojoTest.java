@@ -1,11 +1,6 @@
 package se.alipsa.renjinhamcrestplugin;
 
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.MavenExecutionRequest;
-import org.apache.maven.plugin.testing.AbstractMojoTestCase;
-import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuilder;
-import org.apache.maven.project.ProjectBuildingRequest;
+import static se.alipsa.renjinhamcrestplugin.ResourceLocator.getResourceAsFile;
 
 import java.io.File;
 
@@ -35,9 +30,11 @@ public class RenjinHamcrestMojoTest extends EnhancedAbstractMojoTestCase {
    */
   public void testSomething()
       throws Exception {
-    File pom = getTestFile("src/test/resources/plugin/pom.xml");
-    assertNotNull(pom);
-    assertTrue(pom.exists());
+    File pom = getResourceAsFile("testPom.xml");
+    //File pom = getTestFile("target/test-classes/pom.xml");
+    assertNotNull("Failed to find test pom", pom);
+    assertTrue("pom file does not exist", pom.exists());
+
 
     //RenjinHamcrestMojo myMojo = (RenjinHamcrestMojo) lookupMojo("testR", pom);
     RenjinHamcrestMojo myMojo = (RenjinHamcrestMojo) lookupConfiguredMojo(pom, "testR");

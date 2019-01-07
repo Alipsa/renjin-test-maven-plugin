@@ -1,13 +1,15 @@
 package se.alipsa.renjinhamcrestplugin;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugins.annotations.*;
 import org.apache.maven.project.MavenProject;
+import org.renjin.RenjinVersion;
 import org.renjin.eval.Context;
 import org.renjin.eval.EvalException;
 import org.renjin.eval.Session;
@@ -23,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptException;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -30,6 +33,7 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Goal which runs Renjin Hamcrest test.
@@ -55,9 +59,9 @@ public class RenjinHamcrestMojo extends AbstractMojo {
   }
   */
 
-  @Parameter(name = "outputDirectory", property = "testR.outputDirectory",
-      defaultValue = "${project.build.outputDirectory}/renjin-hamcrest-test-reports", required = true)
-  private File outputDirectory;
+  @Parameter(name = "reportOutputDirectory", property = "testR.reportOutputDirectory",
+      defaultValue = "${project.build.directory}/renjin-hamcrest-test-reports", required = true)
+  private File reportOutputDirectory;
 
   @Parameter( defaultValue = "${project}", readonly = true )
   private MavenProject project;
@@ -65,6 +69,10 @@ public class RenjinHamcrestMojo extends AbstractMojo {
   @Parameter(name = "testSourceDirectory", property = "testR.testSourceDirectory",
       defaultValue = "${project.basedir}/src/test/R", required = true)
   private File testSourceDirectory;
+
+  @Parameter(name = "testOutputDirectory", property = "testR.testOutputDirectory",
+      defaultValue = "${project.build.testOutputDirectory}", required = true)
+  private File testOutputDirectory;
 
   @Parameter(name = "skipTests", property = "testR.skipTests", defaultValue = "false")
   private boolean skipTests;
@@ -81,52 +89,72 @@ public class RenjinHamcrestMojo extends AbstractMojo {
 
   public void execute() throws MojoExecutionException, MojoFailureException {
 
+    logger.info("");
+    logger.info("--------------------------------------------------------");
+    logger.info("               RENJIN HAMCREST TESTS");
+    logger.info("               Renjin ver: {}",RenjinVersion.getVersionName());
+    logger.info("--------------------------------------------------------");
 
     if (project == null) {
       throw new MojoExecutionException("MavenProject is null, cannot continue");
     }
-    if (outputDirectory == null) {
-      throw new MojoExecutionException("outputDirectory is null, cannot continue");
+    if (reportOutputDirectory == null) {
+      throw new MojoExecutionException("reportOutputDirectory is null, cannot continue");
     }
     if (testSourceDirectory == null) {
       throw new MojoExecutionException("testSourceDirectory is null, cannot continue");
     }
 
+    if (!reportOutputDirectory.exists()) {
+      reportOutputDirectory.mkdirs();
+    }
+
+    if (!testOutputDirectory.exists()) {
+      testOutputDirectory.mkdirs();
+    }
+
+    if (testFailureIgnore) {
+      logger.info("testFailureIgnore is true, will not halt the build if test failures occur");
+    }
+
+    try {
+      logger.info("Copying {} to {}", testSourceDirectory, testOutputDirectory);
+      FileUtils.copyDirectory(testSourceDirectory, testOutputDirectory);
+    } catch (IOException e) {
+      throw new MojoExecutionException("Failed to copy files from " + testSourceDirectory + " to " + testOutputDirectory, e);
+    }
+
     factory = new RenjinScriptEngineFactory();
 
 
-    URL[] runtimeUrls = new URL[0];
+    List<URL> runtimeUrls = new ArrayList<>();
     try {
-      List runtimeClasspathElements = project.getRuntimeClasspathElements();
-      runtimeUrls = new URL[runtimeClasspathElements.size()];
-      for (int i = 0; i < runtimeClasspathElements.size(); i++) {
-        String element = (String) runtimeClasspathElements.get(i);
-        runtimeUrls[i] = new File(element).toURI().toURL();
+      /*
+      for (String element : project.getRuntimeClasspathElements()) {
+        runtimeUrls.add(new File(element).toURI().toURL());
+      }*/
+      for (String element : project.getTestClasspathElements()) {
+        runtimeUrls.add(new File(element).toURI().toURL());
       }
+      runtimeUrls.addAll(asUrls(project.getPluginArtifacts()));
+      /*
+      for (String element : project.getCompileClasspathElements()) {
+        runtimeUrls.add(new File(element).toURI().toURL());
+      }*/
+
     } catch (DependencyResolutionRequiredException | MalformedURLException e) {
       throw new MojoExecutionException("Failed to set up classLoader", e);
     }
-    classLoader = new URLClassLoader(runtimeUrls,
+    classLoader = new URLClassLoader(runtimeUrls.toArray(new URL[runtimeUrls.size()]),
         Thread.currentThread().getContextClassLoader());
 
     //classLoader = Thread.currentThread().getContextClassLoader();
     results = new ArrayList<>();
 
-    logger.info("");
-    logger.info("--------------------------------------------------------");
-    logger.info("               RENJIN HAMCREST TESTS");
-    logger.info("--------------------------------------------------------");
-
-    if (!outputDirectory.exists()) {
-      outputDirectory.mkdirs();
-    }
-
-    // throw new MojoExecutionException("Error creating file " + touch, e);
-    Collection<File> testFiles = FileUtils.listFiles(testSourceDirectory, extensions, true);
+    Collection<File> testFiles = FileUtils.listFiles(testOutputDirectory, extensions, true);
 
     for (File testFile : testFiles) {
       runTestFile(testFile);
-
     }
 
     long successes = results.stream().filter(p -> p.getResult().equals(TestResult.OutCome.SUCCESS)).count();
@@ -180,11 +208,28 @@ public class RenjinHamcrestMojo extends AbstractMojo {
     }
   }
 
+  private List<URL> asUrls(Set<Artifact> pluginArtifacts) {
+    List<URL> list = new ArrayList<>(pluginArtifacts.size());
+    for(Artifact artifact : pluginArtifacts) {
+      if (artifact.isResolved()) {
+        File file = artifact.getFile();
+        if (file != null) {
+          try {
+            list.add(file.toURI().toURL());
+          } catch (MalformedURLException e) {
+            logger.warn("Failed to add file url {}", file, e);
+          }
+        }
+      }
+    }
+    return list;
+  }
+
   private String formatMessage(final Throwable error) {
     return error.getMessage().trim().replace("\n", ", ");
   }
 
-  private void runTestFile(final File testFile) {
+  private void runTestFile(final File testFile) throws MojoExecutionException {
 
     String testName = testFile.toString();
     logger.info("");
@@ -195,6 +240,13 @@ public class RenjinHamcrestMojo extends AbstractMojo {
         .withDefaultPackages()
         .setClassLoader(classLoader) //allows imports in r code to work
         .build();
+
+    try {
+      session.setWorkingDirectory(testOutputDirectory);
+    } catch (FileSystemException e) {
+      throw new MojoExecutionException("Failed to set working dir for session to " + testOutputDirectory);
+    }
+
     RenjinScriptEngine engine = factory.getScriptEngine(session);
     // First run any test that are not defined as functions
     TestResult result = runTest(testFile, engine);
@@ -283,5 +335,49 @@ public class RenjinHamcrestMojo extends AbstractMojo {
       return testFunction.getFormals().length() == 0;
     }
     return false;
+  }
+
+  public boolean isTestFailureIgnore() {
+    return testFailureIgnore;
+  }
+
+  public void setTestFailureIgnore(boolean testFailureIgnore) {
+    this.testFailureIgnore = testFailureIgnore;
+  }
+
+  public File getReportOutputDirectory() {
+    return reportOutputDirectory;
+  }
+
+  public void setReportOutputDirectory(File reportOutputDirectory) {
+    this.reportOutputDirectory = reportOutputDirectory;
+  }
+
+  public MavenProject getProject() {
+    return project;
+  }
+
+  public File getTestSourceDirectory() {
+    return testSourceDirectory;
+  }
+
+  public void setTestSourceDirectory(File testSourceDirectory) {
+    this.testSourceDirectory = testSourceDirectory;
+  }
+
+  public File getTestOutputDirectory() {
+    return testOutputDirectory;
+  }
+
+  public void setTestOutputDirectory(File testOutputDirectory) {
+    this.testOutputDirectory = testOutputDirectory;
+  }
+
+  public boolean isSkipTests() {
+    return skipTests;
+  }
+
+  public void setSkipTests(boolean skipTests) {
+    this.skipTests = skipTests;
   }
 }

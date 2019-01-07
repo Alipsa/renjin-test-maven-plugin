@@ -73,13 +73,30 @@ public class EnhancedAbstractMojoTestCase extends AbstractMojoTestCase {
   /** As {@link #lookupConfiguredMojo(MavenProject, String)} but taking the pom file
    * and creating the {@link MavenProject}. */
   protected Mojo lookupConfiguredMojo(File pom, String goal) throws Exception {
-    assertNotNull( pom );
-    assertTrue( pom.exists() );
+    assertNotNull(pom);
+    assertTrue(pom.exists());
 
     ProjectBuildingRequest buildingRequest = newMavenSession().getProjectBuildingRequest();
     ProjectBuilder projectBuilder = lookup(ProjectBuilder.class);
     MavenProject project = projectBuilder.build(pom, buildingRequest).getProject();
 
-    return lookupConfiguredMojo(project, goal);
+    RenjinHamcrestMojo plainMojo = (RenjinHamcrestMojo) lookupMojo(goal, pom);
+    RenjinHamcrestMojo configuredMojo = (RenjinHamcrestMojo) lookupConfiguredMojo(project, goal);
+    if (plainMojo.isTestFailureIgnore() == true) {
+      configuredMojo.setTestFailureIgnore(true);
+    }
+    if (plainMojo.getReportOutputDirectory() != null) {
+      configuredMojo.setReportOutputDirectory(plainMojo.getReportOutputDirectory());
+    }
+    if (plainMojo.isSkipTests() == true) {
+      configuredMojo.setSkipTests(true);
+    }
+    if (plainMojo.getTestOutputDirectory() != null) {
+      configuredMojo.setTestOutputDirectory(plainMojo.getTestOutputDirectory());
+    }
+    if (plainMojo.getTestSourceDirectory() != null) {
+      configuredMojo.setTestSourceDirectory(plainMojo.getTestSourceDirectory());
+    }
+    return configuredMojo;
   }
 }

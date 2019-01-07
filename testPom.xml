@@ -23,8 +23,6 @@
             <plugin>
                 <artifactId>renjin-hamcrest-maven-plugin</artifactId>
                 <configuration>
-                    <!--outputDirectory>target/test-harness/project-to-test</outputDirectory>
-                    <testSourceDirectory>src/test/R</testSourceDirectory-->
                     <testFailureIgnore>true</testFailureIgnore>
                 </configuration>
             </plugin>

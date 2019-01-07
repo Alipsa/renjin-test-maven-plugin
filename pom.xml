@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>se.alipsa</groupId>
   <artifactId>renjin-hamcrest-maven-plugin</artifactId>
@@ -51,6 +51,7 @@
       <groupId>org.renjin</groupId>
       <artifactId>renjin-script-engine</artifactId>
       <version>${renjin.version}</version>
+      <scope>provided</scope>
       <exclusions>
         <exclusion>
           <groupId>commons-logging</groupId>
@@ -59,14 +60,16 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <version>1.7.25</version>
-    </dependency>
-    <dependency>
       <groupId>org.renjin</groupId>
       <artifactId>hamcrest</artifactId>
       <version>${renjin.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <version>1.7.25</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -104,13 +107,13 @@
       <version>3.3.0</version>
       <scope>test</scope>
     </dependency>
-      <!-- used in an R test -->
-      <dependency>
-        <groupId>org.renjin.cran</groupId>
-        <artifactId>downloader</artifactId>
-        <version>0.4-b63</version>
-        <scope>test</scope>
-      </dependency>
+    <!-- used in an R test -->
+    <dependency>
+      <groupId>org.renjin.cran</groupId>
+      <artifactId>downloader</artifactId>
+      <version>0.4-b63</version>
+      <scope>test</scope>
+    </dependency>
     <!--dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-aether-provider</artifactId>
@@ -152,11 +155,11 @@
       <url>https://nexus.bedatadriven.com/content/groups/public/</url>
     </repository>
   </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>bedatadriven</id>
-            <name>bedatadriven public repo</name>
-            <url>https://nexus.bedatadriven.com/content/groups/public/</url>
-        </pluginRepository>
-    </pluginRepositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>bedatadriven</id>
+      <name>bedatadriven public repo</name>
+      <url>https://nexus.bedatadriven.com/content/groups/public/</url>
+    </pluginRepository>
+  </pluginRepositories>
 </project>

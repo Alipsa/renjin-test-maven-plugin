@@ -12,33 +12,64 @@ junit test would do.
 To use it, build it with `mvn clean install` and then add the plugin to your pom as follows:  
 
 ````
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>se.alipsa</groupId>
-                <artifactId>renjin-hamcrest-maven-plugin</artifactId>
-                <version>1.0-SNAPSHOT</version>
-                <configuration>
-                    <testFailureIgnore>true</testFailureIgnore>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>testR</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+      <plugin>
+        <groupId>se.alipsa</groupId>
+        <artifactId>renjin-hamcrest-maven-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <configuration>
+          <testFailureIgnore>true</testFailureIgnore>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>test</phase>
+            <goals>
+              <goal>testR</goal>
+            </goals>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.renjin</groupId>
+            <artifactId>renjin-script-engine</artifactId>
+            <version>${renjin.version}</version>
+            <exclusions>
+              <exclusion>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+              </exclusion>
+            </exclusions>
+          </dependency>
+          <dependency>
+            <groupId>org.renjin</groupId>
+            <artifactId>hamcrest</artifactId>
+            <version>${renjin.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>1.7.25</version>
+          </dependency>
+          <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.25</version>
+          </dependency>
+          <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.25</version>
+          </dependency>
+        </dependencies>
+      </plugin>
 ````
 
 ### Configuration
-- outputDirectory 
-    - where the test logs will ge, default to "${project.build.outputDirectory}/renjin-hamcrest-test-reports"
+- reportOutputDirectory 
+    - where the test logs will be, default to "${project.build.directory}/renjin-hamcrest-test-reports"
 - testSourceDirectory 
-    - where the tests reside, defaults to "${project.basedir}/src/test/R
+    - where the test sources reside, defaults to "${project.basedir}/src/test/R
+- testOutputDirectory
+    - where the tests will be executed from, defaults to "${project.build.testOutputDirectory}"   
 - skipTests
     - Whether to skip tests altogether, defaults to false  
 - testFailureIgnore
