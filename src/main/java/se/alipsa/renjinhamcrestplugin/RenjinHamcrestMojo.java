@@ -61,6 +61,10 @@ public class RenjinHamcrestMojo extends AbstractMojo {
   @Parameter(name = "testFailureIgnore", property = "testR.testFailureIgnore", defaultValue = "false")
   private boolean testFailureIgnore;
 
+  @Parameter(name = "printSuccess", property = "testR.printSuccess", defaultValue = "false")
+  private boolean printSuccess;
+
+
 
   private Logger logger = LoggerFactory.getLogger(RenjinHamcrestMojo.class);
   private ClassLoader classLoader;
@@ -236,7 +240,9 @@ public class RenjinHamcrestMojo extends AbstractMojo {
     TestResult result = new TestResult(testFile);
     try {
       context.evaluate(FunctionCall.newCall(name));
-      logger.debug("\t\t# {}: Success", testName);
+      if (printSuccess) {
+        logger.info("\t\t# {}: Success", testName);
+      }
       result.setResult(TestResult.OutCome.SUCCESS);
       return result;
     } catch (EvalException e) {
@@ -264,7 +270,9 @@ public class RenjinHamcrestMojo extends AbstractMojo {
     try {
       engine.eval(testFile);
       result.setResult(TestResult.OutCome.SUCCESS);
-      logger.debug("\t# {}: Success", testName);
+      if (printSuccess) {
+        logger.debug("\t# {}: Success", testName);
+      }
       return result;
     } catch (org.renjin.parser.ParseException e) {
       exception = e;
