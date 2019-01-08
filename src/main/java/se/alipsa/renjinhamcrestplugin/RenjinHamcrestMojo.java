@@ -271,7 +271,7 @@ public class RenjinHamcrestMojo extends AbstractMojo {
       engine.eval(testFile);
       result.setResult(TestResult.OutCome.SUCCESS);
       if (printSuccess) {
-        logger.debug("\t# {}: Success", testName);
+        logger.info("\t# {}: Success", testName);
       }
       return result;
     } catch (org.renjin.parser.ParseException e) {
