@@ -15,7 +15,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.version>3.6.0</maven.version>
-    <renjin.version>0.9.2718</renjin.version>
+    <renjin.version>0.9.2719</renjin.version>
   </properties>
 
   <!-- Compile -->
