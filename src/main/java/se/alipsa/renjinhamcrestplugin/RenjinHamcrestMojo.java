@@ -190,6 +190,9 @@ public class RenjinHamcrestMojo extends AbstractMojo {
   }
 
   private String formatMessage(final Throwable error) {
+    if (error == null || error.getMessage() == null) {
+      return error + "";
+    }
     return error.getMessage().trim().replace("\n", ", ");
   }
 
