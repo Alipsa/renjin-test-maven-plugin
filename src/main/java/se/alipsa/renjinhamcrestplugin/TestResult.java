@@ -4,18 +4,26 @@ import java.io.File;
 
 public class TestResult {
 
-  File testFile;
-
-  ;
-  OutCome result;
-  Throwable error;
-  String issue;
-
-  public TestResult() {
-  }
+  private File testFile;
+  private  String testMethod;
+  private OutCome result;
+  private Throwable error;
+  private String issue;
 
   public TestResult(File file) {
     this.testFile = file;
+  }
+
+  public File getTestFile() {
+    return testFile;
+  }
+
+  public String getTestMethod() {
+    return testMethod;
+  }
+
+  public void setTestMethod(String testMethod) {
+    this.testMethod = testMethod;
   }
 
   public OutCome getResult() {
@@ -32,10 +40,6 @@ public class TestResult {
 
   public void setError(Throwable error) {
     this.error = error;
-  }
-
-  public File getTestFile() {
-    return testFile;
   }
 
   public String getIssue() {

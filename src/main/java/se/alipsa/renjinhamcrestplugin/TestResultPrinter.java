@@ -1,9 +1,14 @@
 package se.alipsa.renjinhamcrestplugin;
 
 import org.apache.maven.plugin.MojoFailureException;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
 import org.slf4j.Logger;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +53,7 @@ public class TestResultPrinter {
         String errMsg = formatMessage(result.getError());
         logger.error("\t{} : {} : {}",
             result.getResult(),
-            result.issue,
+            result.getIssue(),
             errMsg);
       }
     } else {
@@ -75,7 +80,7 @@ public class TestResultPrinter {
       }
 
       throw new MojoFailureException("There were " + failCount + " failures and " + errorCount + " errors"
-          , errorResult.error);
+          , errorResult.getError());
     }
   }
 
@@ -88,10 +93,36 @@ public class TestResultPrinter {
    *     </testcase>
    * </testsuite>
    */
-  public static void printResultToFile(File reportOutputDirectory, List<TestResult> results,
-                                       boolean testFailureIgnore,  Collection<File> testFiles) {
+  public static void printResultsToFile(File reportOutputDirectory, File testOutputDirectory,
+                                        List<TestResult> results, boolean testFailureIgnore) {
 
+    Map<File, List<TestResult>> resultGroups = results.stream().collect(Collectors.groupingBy(TestResult::getTestFile));
+    resultGroups.forEach((k, v) -> printResultToFile(reportOutputDirectory, testOutputDirectory, v));
+  }
 
+  private static void printResultToFile(File reportOutputDirectory, File testOutputDirectory, List<TestResult> resultGroup){
+    Document document = DocumentHelper.createDocument();
+    Element root = document.addElement("testsuite");
+    root.addAttribute("tests", resultGroup.size() + "");
+    for (TestResult res : resultGroup) {
+      Element testCase = root.addElement("testcase");
+      testCase.addAttribute("classname", res.getTestFile().getName());
+      testCase.addAttribute("name", res.getTestMethod());
+      if (!res.getResult().equals(TestResult.OutCome.SUCCESS)) {
+        Element failure = testCase.addElement("failure");
+        failure.addAttribute("type", res.getResult().toString());
+        failure.addText(res.getIssue());
+      }
+    }
+    // All the file names are the same so we can just grab the first
+    String file = resultGroup.get(0).getTestFile().getAbsolutePath();
+    String strippedPath = file.substring(testOutputDirectory.getAbsolutePath().length(), file.length());
+    File outFile = new File(reportOutputDirectory, "TEST-" + strippedPath);
+    try (FileWriter out = new FileWriter(outFile)) {
+      document.write(out);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 
 }

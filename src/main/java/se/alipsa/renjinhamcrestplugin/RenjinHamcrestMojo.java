@@ -134,12 +134,10 @@ public class RenjinHamcrestMojo extends AbstractMojo {
     }
 
     TestResultPrinter.printResultToConsole(logger, results, testFailureIgnore, testFiles);
-    TestResultPrinter.printResultToFile(reportOutputDirectory, results, testFailureIgnore, testFiles);
+    TestResultPrinter.printResultsToFile(reportOutputDirectory, testOutputDirectory, results, testFailureIgnore);
   }
 
   private void runTestFile(final File testFile) throws MojoExecutionException {
-
-
     String testName = testFile.getAbsolutePath().substring(testOutputDirectory.getAbsolutePath().length() + 1);
     logger.info("");
     logger.info("# Running {}", testName);
@@ -182,6 +180,7 @@ public class RenjinHamcrestMojo extends AbstractMojo {
     String issue;
     Exception exception;
     TestResult result = new TestResult(testFile);
+    result.setTestMethod(methodName);
     try {
       context.evaluate(FunctionCall.newCall(name));
       if (printSuccess) {
@@ -208,6 +207,7 @@ public class RenjinHamcrestMojo extends AbstractMojo {
 
   private TestResult runTest(final File testFile, final RenjinScriptEngine engine) {
     TestResult result = new TestResult(testFile);
+    result.setTestMethod("()");
     String issue;
     Exception exception;
     String testName = testFile.getName();
