@@ -28,7 +28,7 @@ public class RenjinHamcrestMojoTest extends EnhancedAbstractMojoTestCase {
   /**
    * @throws Exception if any
    */
-  public void testSomething()
+  public void testRenjinHamcrestMojo()
       throws Exception {
     File pom = getResourceAsFile("testPom.xml");
     //File pom = getTestFile("target/test-classes/pom.xml");
@@ -40,5 +40,9 @@ public class RenjinHamcrestMojoTest extends EnhancedAbstractMojoTestCase {
     RenjinHamcrestMojo myMojo = (RenjinHamcrestMojo) lookupConfiguredMojo(pom, "testR");
     assertNotNull(myMojo);
     myMojo.execute();
+  }
+
+  public void testSomethingThatFails() {
+    fail("This is a deliberate failure");
   }
 }

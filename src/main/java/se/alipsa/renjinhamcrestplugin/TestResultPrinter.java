@@ -6,9 +6,8 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.slf4j.Logger;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -84,45 +83,80 @@ public class TestResultPrinter {
     }
   }
 
-  /**
-   *<testsuite tests="3">
-   *     <testcase classname="foo1" name="ASuccessfulTest"/>
-   *     <testcase classname="foo2" name="AnotherSuccessfulTest"/>
-   *     <testcase classname="foo3" name="AFailingTest">
-   *         <failure type="NotEnoughFoo"> details about failure </failure>
-   *     </testcase>
-   * </testsuite>
-   */
+
   public static void printResultsToFile(File reportOutputDirectory, File testOutputDirectory,
                                         List<TestResult> results, boolean testFailureIgnore) {
 
     Map<File, List<TestResult>> resultGroups = results.stream().collect(Collectors.groupingBy(TestResult::getTestFile));
-    resultGroups.forEach((k, v) -> printResultToFile(reportOutputDirectory, testOutputDirectory, v));
+    resultGroups.forEach((k, v) -> printResultToFile(reportOutputDirectory, testOutputDirectory, k, v));
   }
 
-  private static void printResultToFile(File reportOutputDirectory, File testOutputDirectory, List<TestResult> resultGroup){
+  /**
+   *<testsuite tests="3" failures="1" name="se.alipsa.renjinhamcrestplugin.RenjinHamcrestMojoTest" time="2.301" errors="0" skipped="0>
+   *     <testcase classname="foo1" name="ASuccessfulTest" time="1.868"/>
+   *     <testcase classname="foo2" name="AnotherSuccessfulTest" time="1.868"/>
+   *     <testcase classname="foo3" name="AFailingTest" time="1.868">
+   *         <failure message="NotEnoughFoo" type="SomeExceptionType"> details about failure </failure>
+   *     </testcase>
+   * </testsuite>
+   */
+  private static void printResultToFile(File reportOutputDirectory, File testOutputDirectory, File testFile, List<TestResult> resultGroup){
+    DecimalFormat format = new DecimalFormat("###.###");
     Document document = DocumentHelper.createDocument();
     Element root = document.addElement("testsuite");
     root.addAttribute("tests", resultGroup.size() + "");
+    double totalTime = 0;
     for (TestResult res : resultGroup) {
       Element testCase = root.addElement("testcase");
-      testCase.addAttribute("classname", res.getTestFile().getName());
+      String testName = res.getTestFile().getName();
+      testCase.addAttribute("classname", testName.substring(0, testName.lastIndexOf(".")));
       testCase.addAttribute("name", res.getTestMethod());
+      double time = ((double)res.getEndTime() - (double)res.getStartTime()) / 1000;
+      totalTime = totalTime + time;
+      testCase.addAttribute("time", format.format(time) );
       if (!res.getResult().equals(TestResult.OutCome.SUCCESS)) {
         Element failure = testCase.addElement("failure");
+        failure.addAttribute("message", res.getIssue());
         failure.addAttribute("type", res.getResult().toString());
-        failure.addText(res.getIssue());
+        failure.addText(asString(res.getError()));
       }
     }
+    Map<TestResult.OutCome, List<TestResult>> resultMap = resultGroup.stream()
+        .collect(Collectors.groupingBy(TestResult::getResult));
+    List<TestResult> failureResults = resultMap.get(TestResult.OutCome.FAILURE);
+    List<TestResult> errorResults = resultMap.get(TestResult.OutCome.ERROR);
+
+    String file = testFile.getAbsolutePath();
+    String strippedPath = file.substring(testOutputDirectory.getAbsolutePath().length() +1).replace(File.separatorChar, '.');
+
+    root.addAttribute("failures",  (failureResults == null ? 0 : failureResults.size()) + "");
+    root.addAttribute("errors", (errorResults == null ? 0 : errorResults.size()) + "");
+    root.addAttribute("name", strippedPath.substring(0, strippedPath.lastIndexOf(".")));
+    root.addAttribute("time", format.format(totalTime));
+
     // All the file names are the same so we can just grab the first
-    String file = resultGroup.get(0).getTestFile().getAbsolutePath();
-    String strippedPath = file.substring(testOutputDirectory.getAbsolutePath().length(), file.length());
-    File outFile = new File(reportOutputDirectory, "TEST-" + strippedPath);
+
+    File outFile = new File(reportOutputDirectory, "TEST-" + strippedPath + ".xml");
     try (FileWriter out = new FileWriter(outFile)) {
       document.write(out);
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  private static String asString(Throwable e) {
+    if (e == null) {
+      return "";
+    }
+    String stackTrace = e.toString();
+    try(StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw)) {
+      e.printStackTrace(pw);
+      stackTrace = sw.toString();
+    } catch (IOException ioe) {
+      ioe.printStackTrace();
+    }
+    return stackTrace;
   }
 
 }

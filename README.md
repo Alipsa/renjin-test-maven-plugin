@@ -104,4 +104,45 @@ Example of overriding a few parameters:
         </plugins>
     </build>
 ````              
+# Generate a test report
+You can use the surefire report plugin to generate a nice looking html report in the target/site dir.
+Add something like the following to your maven pom:
 
+````
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+        <version>3.0.0-M3</version>
+        <configuration>
+          <title>Hamcrest R Tests Report</title>
+          <outputName>hamcrest-report</outputName>
+          <reportsDirectories>${project.build.directory}/renjin-hamcrest-test-reports</reportsDirectories>
+          <linkXRef>false</linkXRef>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>test</phase>
+            <goals>
+              <goal>report-only</goal>
+            </goals>
+          </execution>
+        </executions>
+    </plugin>
+    <!-- the site plugin will create formatting stuff e.g. css etc. --> 
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.7.1</version>
+        <configuration>
+          <generateReports>false</generateReports>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>test</phase>
+            <goals>
+              <goal>site</goal>
+            </goals>
+          </execution>
+        </executions>
+    </plugin>
+````      

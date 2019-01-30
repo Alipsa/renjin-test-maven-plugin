@@ -174,12 +174,13 @@ public class RenjinHamcrestMojo extends AbstractMojo {
   }
 
   private TestResult runTestFunction(final Context context, final File testFile, final Symbol name) {
+    TestResult result = new TestResult(testFile);
+    result.setStartTime(System.currentTimeMillis());
     String methodName = name.getPrintName().trim() + "()";
     String testName = testFile.getName() + ": " + methodName ;
     logger.info("\t# Running test function {} in {}", methodName, testFile.getName());
     String issue;
     Exception exception;
-    TestResult result = new TestResult(testFile);
     result.setTestMethod(methodName);
     try {
       context.evaluate(FunctionCall.newCall(name));
@@ -187,6 +188,7 @@ public class RenjinHamcrestMojo extends AbstractMojo {
         logger.info("\t\t# {}: Success", testName);
       }
       result.setResult(TestResult.OutCome.SUCCESS);
+      result.setEndTime(System.currentTimeMillis());
       return result;
     } catch (EvalException e) {
       exception = e;
@@ -202,11 +204,13 @@ public class RenjinHamcrestMojo extends AbstractMojo {
     result.setResult(TestResult.OutCome.FAILURE);
     result.setError(exception);
     result.setIssue(issue);
+    result.setEndTime(System.currentTimeMillis());
     return result;
   }
 
   private TestResult runTest(final File testFile, final RenjinScriptEngine engine) {
     TestResult result = new TestResult(testFile);
+    result.setStartTime(System.currentTimeMillis());
     result.setTestMethod("()");
     String issue;
     Exception exception;
@@ -217,6 +221,7 @@ public class RenjinHamcrestMojo extends AbstractMojo {
       if (printSuccess) {
         logger.info("\t# {}: Success", testName);
       }
+      result.setEndTime(System.currentTimeMillis());
       return result;
     } catch (org.renjin.parser.ParseException e) {
       exception = e;
@@ -238,6 +243,7 @@ public class RenjinHamcrestMojo extends AbstractMojo {
     result.setResult(TestResult.OutCome.FAILURE);
     result.setError(exception);
     result.setIssue(issue);
+    result.setEndTime(System.currentTimeMillis());
     return result;
   }
 

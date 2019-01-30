@@ -9,6 +9,8 @@ public class TestResult {
   private OutCome result;
   private Throwable error;
   private String issue;
+  private long startTime;
+  private long endTime;
 
   public TestResult(File file) {
     this.testFile = file;
@@ -51,4 +53,20 @@ public class TestResult {
   }
 
   public enum OutCome {SUCCESS, FAILURE, ERROR}
+
+  public long getStartTime() {
+    return startTime;
+  }
+
+  public void setStartTime(long startTime) {
+    this.startTime = startTime;
+  }
+
+  public long getEndTime() {
+    return endTime;
+  }
+
+  public void setEndTime(long endTime) {
+    this.endTime = endTime;
+  }
 }
