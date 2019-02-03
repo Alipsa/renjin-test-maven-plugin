@@ -4,7 +4,7 @@ A maven plugin to execute R hamcrest tests using the Renjin ScriptEngine
 It executes R Hamcrest test located in src/test/R dir.
 
 In some regards it is not as advanced as the test plugin in the renjin-maven-plugin e.g.
-tests are not forked and hence a severely misbehaving test could crash the build but
+tests are not forked and hence slightly slower; also a severely misbehaving test could crash the build but
 it does provide more developer friendly output saving you from having to analyze log output
 in the test result files. Also print() in the test will write to the console just like a
 junit test would do. 
@@ -47,7 +47,7 @@ To use it, build it with `mvn clean install` and then add the plugin to your pom
         </dependencies>
       </plugin>
 ````
-Where ${renjin.version} is the version of Renjin you want to use e.g. 0.9.2718
+Where ${renjin.version} is the version of Renjin you want to use e.g. 0.9.2719
 
 ### Configuration
 - reportOutputDirectory 
@@ -59,7 +59,7 @@ Where ${renjin.version} is the version of Renjin you want to use e.g. 0.9.2718
 - skipTests
     - Whether to skip tests altogether, defaults to false  
 - testFailureIgnore
-    - Whether to halt the build on the first faiure encountered or not, defaults to false
+    - Whether to halt the build on the first failure encountered or not, defaults to false
     
 Example of overriding a few parameters:
 ````

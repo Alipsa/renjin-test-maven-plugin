@@ -8,8 +8,10 @@ import org.slf4j.Logger;
 
 import java.io.*;
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -101,19 +103,26 @@ public class TestResultPrinter {
    * </testsuite>
    */
   private static void printResultToFile(File reportOutputDirectory, File testOutputDirectory, File testFile, List<TestResult> resultGroup){
-    DecimalFormat format = new DecimalFormat("###.###");
+
+    DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols(Locale.getDefault());
+    otherSymbols.setDecimalSeparator('.');
+    otherSymbols.setGroupingSeparator(',');
+    DecimalFormat format = new DecimalFormat("###.###", otherSymbols);
+
     Document document = DocumentHelper.createDocument();
     Element root = document.addElement("testsuite");
     root.addAttribute("tests", resultGroup.size() + "");
-    double totalTime = 0;
+    Long totalTime = 0L;
     for (TestResult res : resultGroup) {
       Element testCase = root.addElement("testcase");
       String testName = res.getTestFile().getName();
       testCase.addAttribute("classname", testName.substring(0, testName.lastIndexOf(".")));
       testCase.addAttribute("name", res.getTestMethod());
-      double time = ((double)res.getEndTime() - (double)res.getStartTime()) / 1000;
+      Long time = res.getEndTime() - res.getStartTime();
       totalTime = totalTime + time;
-      testCase.addAttribute("time", format.format(time) );
+      double sec = time.doubleValue() / 1000.0;
+      System.out.println("sec for test " + testName + " id " + sec);
+      testCase.addAttribute("time", format.format(sec) );
       if (!res.getResult().equals(TestResult.OutCome.SUCCESS)) {
         Element failure = testCase.addElement("failure");
         failure.addAttribute("message", res.getIssue());
@@ -131,8 +140,11 @@ public class TestResultPrinter {
 
     root.addAttribute("failures",  (failureResults == null ? 0 : failureResults.size()) + "");
     root.addAttribute("errors", (errorResults == null ? 0 : errorResults.size()) + "");
-    root.addAttribute("name", strippedPath.substring(0, strippedPath.lastIndexOf(".")));
-    root.addAttribute("time", format.format(totalTime));
+    String name = strippedPath.substring(0, strippedPath.lastIndexOf("."));
+    root.addAttribute("name", name);
+    double totalSec = totalTime.doubleValue()/1000.0;
+    root.addAttribute("time", format.format(totalSec));
+    System.out.println("Time for test file " + name + " is " + totalSec);
 
     // All the file names are the same so we can just grab the first
 
