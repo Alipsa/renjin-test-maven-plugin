@@ -8,7 +8,27 @@
 
   <packaging>maven-plugin</packaging>
   <name>renjin-hamcrest-maven-plugin Maven Mojo</name>
-  <url>http://maven.apache.org</url>
+  <description>A maven plugin to execute R hamcrest tests using the Renjin ScriptEngine</description>
+  <url>https://github.com/perNyfelt/renjin-hamcrest-maven-plugin</url>
+  <licenses>
+    <license>
+      <name>MIT</name>
+      <url>https://github.com/perNyfelt/renjin-hamcrest-maven-plugin/blob/master/LICENSEt</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>Per Nyfelt</name>
+      <email>per.nyfelt@alipsa.se</email>
+      <organization>Alipsa HB</organization>
+      <organizationUrl>http://www.alipsa.se</organizationUrl>
+    </developer>
+  </developers>
+  <scm>
+    <connection>scm:git:https://github.com/perNyfelt/renjin-hamcrest-maven-plugin.git</connection>
+    <developerConnection>scm:git:https://github.com/perNyfelt/renjin-hamcrest-maven-plugin.git</developerConnection>
+    <url>https://github.com/perNyfelt/renjin-hamcrest-maven-plugin/tree/master</url>
+  </scm>
 
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
