@@ -1,5 +1,6 @@
 package se.alipsa.renjinhamcrestplugin;
 
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.maven.plugin.MojoFailureException;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -9,6 +10,7 @@ import org.slf4j.Logger;
 import java.io.*;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -60,7 +62,14 @@ public class TestResultPrinter {
     } else {
       logger.info("\tSUCCESS! {} tests run", results.size());
     }
+    long totalTime = 0;
+    for(TestResult res : results) {
+      totalTime += res.getEndTime() - res.getStartTime();
+    }
 
+    logger.info("");
+    logger.info("Total time: {}", DurationFormatUtils.formatDuration(totalTime,
+        "'minutes: 'mm' seconds: 'ss' millis: 'SSS"), false);
     logger.info("");
     logger.info("--------------END OF RENJIN HAMCREST TESTS--------------\n");
 
@@ -121,7 +130,7 @@ public class TestResultPrinter {
       Long time = res.getEndTime() - res.getStartTime();
       totalTime = totalTime + time;
       double sec = time.doubleValue() / 1000.0;
-      System.out.println("sec for test " + testName + " id " + sec);
+      //System.out.println("sec for test " + testName + " id " + sec);
       testCase.addAttribute("time", format.format(sec) );
       if (!res.getResult().equals(TestResult.OutCome.SUCCESS)) {
         Element failure = testCase.addElement("failure");
@@ -144,7 +153,7 @@ public class TestResultPrinter {
     root.addAttribute("name", name);
     double totalSec = totalTime.doubleValue()/1000.0;
     root.addAttribute("time", format.format(totalSec));
-    System.out.println("Time for test file " + name + " is " + totalSec);
+    //System.out.println("Time for test file " + name + " is " + totalSec);
 
     // All the file names are the same so we can just grab the first
 

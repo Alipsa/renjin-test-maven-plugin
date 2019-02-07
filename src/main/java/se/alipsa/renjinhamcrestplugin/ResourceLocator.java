@@ -17,6 +17,13 @@ public class ResourceLocator {
   private static Logger logger = LoggerFactory.getLogger(ResourceLocator.class);
 
 
+  /**
+   * Find a file using available class loaders.
+   * @param name the resource name
+   * @param encodingOpt optional file encoding (default is UTF-8)
+   * @return the file corresponding to the resource name
+   * @throws FileNotFoundException if the resource cannot be found
+   */
   public static File getResourceAsFile(String name, String... encodingOpt) throws FileNotFoundException {
     String encoding = encodingOpt.length > 0 ? encodingOpt[0] : "UTF-8";
     URL url = getResourceAsUrl(name);
@@ -39,6 +46,9 @@ public class ResourceLocator {
    * <p>
    * For OSGI resources different bundles might have different classloaders
    * so pass the class of the bundle where the resources are to find them.</p>
+   * @param resource the resource name
+   * @param caller the (optional) calling class useful for e.g. OSGI scenarios
+   * @return a URL to the resource or null if no resource found
    */
   public static URL getResourceAsUrl(String resource, Class... caller) {
     final List<ClassLoader> classLoaders = new ArrayList<ClassLoader>();

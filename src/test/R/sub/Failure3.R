@@ -5,7 +5,9 @@
 library(hamcrest)
 
 test.meanCarTravelDistance <- function() {
-    print(mean(cars[,2]))
+    meanDist <- mean(cars[,2])
+    print(meanDist)
+    assertThat(meanDist, equalTo(42.98))
 }
 
 test.downloader <- function() {

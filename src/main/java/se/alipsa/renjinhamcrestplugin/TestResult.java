@@ -2,6 +2,9 @@ package se.alipsa.renjinhamcrestplugin;
 
 import java.io.File;
 
+/**
+ * This represents the outcome (test result) of each test.
+ */
 public class TestResult {
 
   private File testFile;
