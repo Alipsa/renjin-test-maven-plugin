@@ -3,8 +3,8 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>se.alipsa</groupId>
     <artifactId>renjin-hamcrest-maven-plugin</artifactId>
-    <!--version>1.1-SNAPSHOT</version-->
-    <version>1.1</version>
+    <version>1.2-SNAPSHOT</version>
+    <!--version>1.1</version-->
 
     <packaging>maven-plugin</packaging>
     <name>renjin-hamcrest-maven-plugin Maven Mojo</name>
