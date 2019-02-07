@@ -9,7 +9,47 @@ it does provide more developer friendly output saving you from having to analyze
 in the test result files. Also print() in the test will write to the console just like a
 junit test would do. 
 
-To use it, build it with `mvn clean install` and then add the plugin to your pom as follows:  
+To use it add the following to your maven build plugins section:
+
+````
+      <plugin>
+        <groupId>se.alipsa</groupId>
+        <artifactId>renjin-hamcrest-maven-plugin</artifactId>
+        <version>1.1</version>
+        <configuration>
+          <testFailureIgnore>true</testFailureIgnore>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>test</phase>
+            <goals>
+              <goal>testR</goal>
+            </goals>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.renjin</groupId>
+            <artifactId>renjin-script-engine</artifactId>
+            <version>${renjin.version}</version>
+            <exclusions>
+              <!-- optional but needed if you use e.g.slf4j (then use the jcl bridge instead) -->
+              <exclusion>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+              </exclusion>
+            </exclusions>
+          </dependency>
+          <dependency>
+            <groupId>org.renjin</groupId>
+            <artifactId>hamcrest</artifactId>
+            <version>${renjin.version}</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+````
+
+To use the latest code, build it with `mvn clean install` and then add the plugin to your pom as follows:  
 
 ````
       <plugin>
