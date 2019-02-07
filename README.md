@@ -55,7 +55,8 @@ To use the latest code, build it with `mvn clean install` and then add the plugi
       <plugin>
         <groupId>se.alipsa</groupId>
         <artifactId>renjin-hamcrest-maven-plugin</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <!-- match the version with the version in the plugin pom -->
+        <version>1.1-SNAPSHOT</version>
         <configuration>
           <testFailureIgnore>true</testFailureIgnore>
         </configuration>
@@ -108,7 +109,7 @@ Example of overriding a few parameters:
             <plugin>
                 <groupId>se.alipsa</groupId>
                 <artifactId>renjin-hamcrest-maven-plugin</artifactId>
-                <version>1.0-SNAPSHOT</version>
+                <version>1.1</version>
                 <configuration>
                     <outputDirectory>target/test-harness/project-to-test</outputDirectory>
                     <testSourceDirectory>R/test</testSourceDirectory>
