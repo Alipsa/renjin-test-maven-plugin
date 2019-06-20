@@ -114,16 +114,14 @@ public class RenjinHamcrestMojo extends AbstractMojo {
 
     List<URL> runtimeUrls = new ArrayList<>();
     try {
-      // Add classpath from calling pom
+      // Add classpath from calling pom, i.e. compile + system + provided + runtime + test
       for (String element : project.getTestClasspathElements()) {
         runtimeUrls.add(new File(element).toURI().toURL());
       }
-
     } catch (DependencyResolutionRequiredException | MalformedURLException e) {
       throw new MojoExecutionException("Failed to set up classLoader", e);
     }
-    classLoader = new URLClassLoader(runtimeUrls.toArray(new URL[0]),
-        Thread.currentThread().getContextClassLoader());
+    classLoader = new URLClassLoader(runtimeUrls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
 
     results = new ArrayList<>();
 
