@@ -105,7 +105,11 @@ public class RenjinHamcrestMojo extends AbstractMojo {
 
     try {
       logger.info("Copying {} to {}", testSourceDirectory, testOutputDirectory);
-      FileUtils.copyDirectory(testSourceDirectory, testOutputDirectory);
+      if (testSourceDirectory.exists()) {
+        FileUtils.copyDirectory(testSourceDirectory, testOutputDirectory);
+      } else {
+        logger.info("No test files found in test source directory {}", testSourceDirectory);
+      }
     } catch (IOException e) {
       throw new MojoExecutionException("Failed to copy files from " + testSourceDirectory + " to " + testOutputDirectory, e);
     }
