@@ -56,6 +56,13 @@ public class RenjinHamcrestMojo extends AbstractMojo {
       defaultValue = "${project.build.testOutputDirectory}", required = true)
   private File testOutputDirectory;
 
+  @Parameter(name = "sourceDirectory", property = "testR.sourceDirectory",
+      defaultValue = "${project.basedir}/src/main/R", required = true)
+  private File sourceDirectory;
+
+  @Parameter(name = "runSourceScriptsBeforeTests", property = "testR.runSourceScriptsBeforeTests", defaultValue = "false")
+  private boolean runSourceScriptsBeforeTests;
+
   @Parameter(name = "skipTests", property = "testR.skipTests", defaultValue = "false")
   private boolean skipTests;
 
@@ -72,6 +79,7 @@ public class RenjinHamcrestMojo extends AbstractMojo {
   private String[] extensions = new String[]{"R", "S"};
   private List<TestResult> results;
   private RenjinScriptEngineFactory factory;
+  private Session session;
 
   public void execute() throws MojoExecutionException, MojoFailureException {
 
@@ -116,6 +124,11 @@ public class RenjinHamcrestMojo extends AbstractMojo {
     }
 
     factory = new RenjinScriptEngineFactory();
+    SessionBuilder builder = new SessionBuilder();
+    session = builder
+        .withDefaultPackages()
+        .setClassLoader(classLoader) //allows imports in r code to work
+        .build();
 
     List<URL> runtimeUrls = new ArrayList<>();
     try {
@@ -130,6 +143,13 @@ public class RenjinHamcrestMojo extends AbstractMojo {
 
     results = new ArrayList<>();
 
+    if (runSourceScriptsBeforeTests) {
+      Collection<File> sourceFiles = FileUtils.listFiles(sourceDirectory, extensions, true);
+      for (File sourceFile : sourceFiles) {
+        runRscript(sourceFile);
+      }
+    }
+
     Collection<File> testFiles = FileUtils.listFiles(testOutputDirectory, extensions, true);
 
     for (File testFile : testFiles) {
@@ -140,16 +160,22 @@ public class RenjinHamcrestMojo extends AbstractMojo {
     TestResultPrinter.printResultsToFile(reportOutputDirectory, testOutputDirectory, results, testFailureIgnore);
   }
 
+  private void runRscript(final File sourceFile) throws MojoExecutionException {
+    String sourceName = sourceFile.getName();
+    logger.info("");
+    logger.info("# Running {}", sourceName);
+    RenjinScriptEngine engine = factory.getScriptEngine(session);
+    try {
+      engine.eval(sourceFile);
+    } catch (Exception e) {
+      throw new MojoExecutionException("Failed to run rscript " + sourceName);
+    }
+  }
+
   private void runTestFile(final File testFile) throws MojoExecutionException {
     String testName = testFile.getAbsolutePath().substring(testOutputDirectory.getAbsolutePath().length() + 1);
     logger.info("");
     logger.info("# Running {}", testName);
-
-    SessionBuilder builder = new SessionBuilder();
-    Session session = builder
-        .withDefaultPackages()
-        .setClassLoader(classLoader) //allows imports in r code to work
-        .build();
 
     try {
       session.setWorkingDirectory(testOutputDirectory);
