@@ -123,13 +123,6 @@ public class RenjinHamcrestMojo extends AbstractMojo {
       throw new MojoExecutionException("Failed to copy files from " + testSourceDirectory + " to " + testOutputDirectory, e);
     }
 
-    factory = new RenjinScriptEngineFactory();
-    SessionBuilder builder = new SessionBuilder();
-    session = builder
-        .withDefaultPackages()
-        .setClassLoader(classLoader) //allows imports in r code to work
-        .build();
-
     List<URL> runtimeUrls = new ArrayList<>();
     try {
       // Add classpath from calling pom, i.e. compile + system + provided + runtime + test
@@ -140,6 +133,13 @@ public class RenjinHamcrestMojo extends AbstractMojo {
       throw new MojoExecutionException("Failed to set up classLoader", e);
     }
     classLoader = new URLClassLoader(runtimeUrls.toArray(new URL[0]), Thread.currentThread().getContextClassLoader());
+
+    factory = new RenjinScriptEngineFactory();
+    SessionBuilder builder = new SessionBuilder();
+    session = builder
+        .withDefaultPackages()
+        .setClassLoader(classLoader) //allows imports in r code to work
+        .build();
 
     results = new ArrayList<>();
 
@@ -166,9 +166,10 @@ public class RenjinHamcrestMojo extends AbstractMojo {
     logger.info("# Running {}", sourceName);
     RenjinScriptEngine engine = factory.getScriptEngine(session);
     try {
+      engine.getSession().setWorkingDirectory(sourceFile.getParentFile());
       engine.eval(sourceFile);
     } catch (Exception e) {
-      throw new MojoExecutionException("Failed to run rscript " + sourceName);
+      throw new MojoExecutionException("Failed to run rscript " + sourceFile.getAbsolutePath(), e);
     }
   }
 
