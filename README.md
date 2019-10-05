@@ -101,7 +101,14 @@ Where ${renjin.version} is the version of Renjin you want to use e.g. 0.9.2719
     - Whether to skip tests altogether, defaults to false  
 - testFailureIgnore
     - Whether to halt the build on the first failure encountered or not, defaults to false
-    
+- runSourceScriptsBeforeTests
+    -Whether to run the R scripts in src/main/R prior to running tests )useful for non-package projects), 
+    defaults for false.
+- sourceDirectory
+    - where the main R scripts are, defaults to "${project.basedir}/src/main/R"
+- printSuccess
+    - excho "Success" after each test is successful, defaults to false
+                
 Example of overriding a few parameters:
 ````
     <build>
