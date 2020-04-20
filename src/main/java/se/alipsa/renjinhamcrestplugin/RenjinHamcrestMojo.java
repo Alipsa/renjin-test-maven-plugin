@@ -192,7 +192,7 @@ public class RenjinHamcrestMojo extends AbstractMojo {
     //now run each testFunction in that file, in the same Session
     for (Symbol name : session.getGlobalEnvironment().getSymbolNames()) {
       String methodName = name.getPrintName().trim();
-      if (methodName.startsWith("test.")) {
+      if (methodName.startsWith("test.") || methodName.startsWith("test_check")) {
         SEXP value = session.getGlobalEnvironment().getVariable(session.getTopLevelContext(), name);
         if (isNoArgsFunction(value)) {
           Context context = session.getTopLevelContext();
