@@ -1,5 +1,8 @@
 # renjin-hamcrest-maven-plugin
 A maven plugin to execute R tests using the Renjin ScriptEngine
+See [Using the hamcrest package to write unit tests](http://docs.renjin.org/en/latest/writing-renjin-extensions.html#using-the-hamcrest-package-to-write-unit-tests)
+for more info about Renjin Hamcrest.
+
 
 It executes R Hamcrest test located in src/test/R dir per default.
 Testthat tests are also supported. 
