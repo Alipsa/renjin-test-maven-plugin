@@ -12,83 +12,87 @@ junit test would do.
 
 To use it add the following to your maven build plugins section:
 
-````
-      <plugin>
-        <groupId>se.alipsa</groupId>
-        <artifactId>renjin-test-maven-plugin</artifactId>
-        <version>1.3</version>
-        <configuration>
-          <testFailureIgnore>true</testFailureIgnore>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>test</phase>
-            <goals>
-              <goal>testR</goal>
-            </goals>
-          </execution>
-        </executions>
-        <dependencies>
-          <dependency>
-            <groupId>org.renjin</groupId>
-            <artifactId>renjin-script-engine</artifactId>
-            <version>${renjin.version}</version>
-            <exclusions>
-              <!-- optional but needed if you use e.g.slf4j (then use the jcl bridge instead) -->
-              <exclusion>
-                <groupId>commons-logging</groupId>
-                <artifactId>commons-logging</artifactId>
-              </exclusion>
-            </exclusions>
-          </dependency>
-          <dependency>
-            <groupId>org.renjin</groupId>
-            <artifactId>hamcrest</artifactId>
-            <version>${renjin.version}</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-````
+```xml
+<plugins>
+  <plugin>
+    <groupId>se.alipsa</groupId>
+    <artifactId>renjin-test-maven-plugin</artifactId>
+    <version>1.3</version>
+    <configuration>
+      <testFailureIgnore>true</testFailureIgnore>
+    </configuration>
+    <executions>
+      <execution>
+        <phase>test</phase>
+        <goals>
+          <goal>testR</goal>
+        </goals>
+      </execution>
+    </executions>
+    <dependencies>
+      <dependency>
+        <groupId>org.renjin</groupId>
+        <artifactId>renjin-script-engine</artifactId>
+        <version>${renjin.version}</version>
+        <exclusions>
+          <!-- optional but needed if you use e.g.slf4j (then use the jcl bridge instead) -->
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.renjin</groupId>
+        <artifactId>hamcrest</artifactId>
+        <version>${renjin.version}</version>
+      </dependency>
+    </dependencies>
+  </plugin>
+</plugins>
+```
 
 To use the latest code, build it with `mvn clean install` and then add the plugin to your pom as follows:  
 
-````
-      <plugin>
-        <groupId>se.alipsa</groupId>
-        <artifactId>renjin-test-maven-plugin</artifactId>
-        <!-- match the version with the version in the plugin pom -->
-        <version>1.3</version>
-        <configuration>
-          <testFailureIgnore>true</testFailureIgnore>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>test</phase>
-            <goals>
-              <goal>testR</goal>
-            </goals>
-          </execution>
-        </executions>
-        <dependencies>
-          <dependency>
-            <groupId>org.renjin</groupId>
-            <artifactId>renjin-script-engine</artifactId>
-            <version>${renjin.version}</version>
-            <exclusions>
-              <exclusion>
-                <groupId>commons-logging</groupId>
-                <artifactId>commons-logging</artifactId>
-              </exclusion>
-            </exclusions>
-          </dependency>
-          <dependency>
-            <groupId>org.renjin</groupId>
-            <artifactId>hamcrest</artifactId>
-            <version>${renjin.version}</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-````
+```xml
+<plugins>
+  <plugin>
+    <groupId>se.alipsa</groupId>
+    <artifactId>renjin-test-maven-plugin</artifactId>
+    <!-- match the version with the version in the plugin pom -->
+    <version>1.3</version>
+    <configuration>
+      <testFailureIgnore>true</testFailureIgnore>
+    </configuration>
+    <executions>
+      <execution>
+        <phase>test</phase>
+        <goals>
+          <goal>testR</goal>
+        </goals>
+      </execution>
+    </executions>
+    <dependencies>
+      <dependency>
+        <groupId>org.renjin</groupId>
+        <artifactId>renjin-script-engine</artifactId>
+        <version>${renjin.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.renjin</groupId>
+        <artifactId>hamcrest</artifactId>
+        <version>${renjin.version}</version>
+      </dependency>
+    </dependencies>
+  </plugin>
+</plugins>
+```
 Where ${renjin.version} is the version of Renjin you want to use e.g. 0.9.2719
 
 ### Configuration
@@ -157,7 +161,8 @@ Example of overriding a few parameters:
 You can use the surefire report plugin to generate a nice looking html report in the target/site dir.
 Add something like the following to your maven pom:
 
-````
+```xml
+<plugins>
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
@@ -194,7 +199,9 @@ Add something like the following to your maven pom:
           </execution>
         </executions>
     </plugin>
-````      
+</plugins>
+```      
+Then run `mvn clean test site` or similar to generate the report
 
 # Executing both hamcrest and testthat tests
 If you have both in one project you need to add an additional execution target
