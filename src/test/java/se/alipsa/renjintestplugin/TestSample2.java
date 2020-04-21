@@ -1,4 +1,4 @@
-package se.alipsa.renjinhamcrestplugin;
+package se.alipsa.renjintestplugin;
 
 import org.junit.Test;
 

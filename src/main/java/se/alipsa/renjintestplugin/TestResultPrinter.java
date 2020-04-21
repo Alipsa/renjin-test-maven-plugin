@@ -1,4 +1,4 @@
-package se.alipsa.renjinhamcrestplugin;
+package se.alipsa.renjintestplugin;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.maven.plugin.MojoFailureException;
@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import java.io.*;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -71,7 +70,7 @@ public class TestResultPrinter {
     logger.info("Total time: {}", DurationFormatUtils.formatDuration(totalTime,
         "'minutes: 'mm' seconds: 'ss' millis: 'SSS"), false);
     logger.info("");
-    logger.info("--------------END OF RENJIN HAMCREST TESTS--------------\n");
+    logger.info("--------------END OF RENJIN TESTS--------------\n");
 
     if (errorsDuringTests && !testFailureIgnore) {
       // pick the first one otherwise the only thing that will be seen is this class having an issue
@@ -103,7 +102,7 @@ public class TestResultPrinter {
   }
 
   /**
-   *<testsuite tests="3" failures="1" name="se.alipsa.renjinhamcrestplugin.RenjinHamcrestMojoTest" time="2.301" errors="0" skipped="0>
+   *<testsuite tests="3" failures="1" name="se.alipsa.renjintestplugin.RenjinTestMojoTest" time="2.301" errors="0" skipped="0>
    *     <testcase classname="foo1" name="ASuccessfulTest" time="1.868"/>
    *     <testcase classname="foo2" name="AnotherSuccessfulTest" time="1.868"/>
    *     <testcase classname="foo3" name="AFailingTest" time="1.868">

@@ -1,4 +1,4 @@
-package se.alipsa.renjinhamcrestplugin;
+package se.alipsa.renjintestplugin;
 
 import java.io.File;
 import java.util.Arrays;
@@ -80,8 +80,8 @@ public class EnhancedAbstractMojoTestCase extends AbstractMojoTestCase {
     ProjectBuilder projectBuilder = lookup(ProjectBuilder.class);
     MavenProject project = projectBuilder.build(pom, buildingRequest).getProject();
 
-    RenjinHamcrestMojo plainMojo = (RenjinHamcrestMojo) lookupMojo(goal, pom);
-    RenjinHamcrestMojo configuredMojo = (RenjinHamcrestMojo) lookupConfiguredMojo(project, goal);
+    RenjinTestMojo plainMojo = (RenjinTestMojo) lookupMojo(goal, pom);
+    RenjinTestMojo configuredMojo = (RenjinTestMojo) lookupConfiguredMojo(project, goal);
     if (plainMojo.isTestFailureIgnore() == true) {
       configuredMojo.setTestFailureIgnore(true);
     }

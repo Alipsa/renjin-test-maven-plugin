@@ -1,4 +1,4 @@
-package se.alipsa.renjinhamcrestplugin;
+package se.alipsa.renjintestplugin;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

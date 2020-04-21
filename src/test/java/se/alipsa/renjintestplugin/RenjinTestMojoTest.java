@@ -1,10 +1,10 @@
-package se.alipsa.renjinhamcrestplugin;
+package se.alipsa.renjintestplugin;
 
-import static se.alipsa.renjinhamcrestplugin.ResourceLocator.getResourceAsFile;
+import static se.alipsa.renjintestplugin.ResourceLocator.getResourceAsFile;
 
 import java.io.File;
 
-public class RenjinHamcrestMojoTest extends EnhancedAbstractMojoTestCase {
+public class RenjinTestMojoTest extends EnhancedAbstractMojoTestCase {
 
   /**
    * {@inheritDoc}
@@ -28,7 +28,7 @@ public class RenjinHamcrestMojoTest extends EnhancedAbstractMojoTestCase {
   /**
    * @throws Exception if any
    */
-  public void testRenjinHamcrestMojo()
+  public void testRenjinTestMojo()
       throws Exception {
     File pom = getResourceAsFile("testPom.xml");
     //File pom = getTestFile("target/test-classes/pom.xml");
@@ -37,7 +37,7 @@ public class RenjinHamcrestMojoTest extends EnhancedAbstractMojoTestCase {
 
 
     //RenjinHamcrestMojo myMojo = (RenjinHamcrestMojo) lookupMojo("testR", pom);
-    RenjinHamcrestMojo myMojo = (RenjinHamcrestMojo) lookupConfiguredMojo(pom, "testR");
+    RenjinTestMojo myMojo = (RenjinTestMojo) lookupConfiguredMojo(pom, "testR");
     assertNotNull(myMojo);
     myMojo.execute();
   }

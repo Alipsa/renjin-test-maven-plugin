@@ -1,7 +1,8 @@
 # renjin-hamcrest-maven-plugin
-A maven plugin to execute R hamcrest tests using the Renjin ScriptEngine
+A maven plugin to execute R tests using the Renjin ScriptEngine
 
-It executes R Hamcrest test located in src/test/R dir.
+It executes R Hamcrest test located in src/test/R dir per default.
+Testthat tests are also supported. 
 
 In some regards it is not as advanced as the test plugin in the renjin-maven-plugin e.g.
 tests are not forked and hence slightly slower; also a severely misbehaving test could crash the build but
@@ -14,8 +15,8 @@ To use it add the following to your maven build plugins section:
 ````
       <plugin>
         <groupId>se.alipsa</groupId>
-        <artifactId>renjin-hamcrest-maven-plugin</artifactId>
-        <version>1.1</version>
+        <artifactId>renjin-test-maven-plugin</artifactId>
+        <version>1.3</version>
         <configuration>
           <testFailureIgnore>true</testFailureIgnore>
         </configuration>
@@ -54,9 +55,9 @@ To use the latest code, build it with `mvn clean install` and then add the plugi
 ````
       <plugin>
         <groupId>se.alipsa</groupId>
-        <artifactId>renjin-hamcrest-maven-plugin</artifactId>
+        <artifactId>renjin-test-maven-plugin</artifactId>
         <!-- match the version with the version in the plugin pom -->
-        <version>1.1-SNAPSHOT</version>
+        <version>1.3</version>
         <configuration>
           <testFailureIgnore>true</testFailureIgnore>
         </configuration>
@@ -115,8 +116,8 @@ Example of overriding a few parameters:
         <plugins>
             <plugin>
                 <groupId>se.alipsa</groupId>
-                <artifactId>renjin-hamcrest-maven-plugin</artifactId>
-                <version>1.1</version>
+                <artifactId>renjin-test-maven-plugin</artifactId>
+                <version>1.3</version>
                 <configuration>
                     <outputDirectory>target/test-harness/project-to-test</outputDirectory>
                     <testSourceDirectory>R/test</testSourceDirectory>
@@ -162,9 +163,9 @@ Add something like the following to your maven pom:
         <artifactId>maven-surefire-report-plugin</artifactId>
         <version>3.0.0-M3</version>
         <configuration>
-          <title>Hamcrest R Tests Report</title>
-          <outputName>hamcrest-report</outputName>
-          <reportsDirectories>${project.build.directory}/renjin-hamcrest-test-reports</reportsDirectories>
+          <title>R Tests Report</title>
+          <outputName>test-report</outputName>
+          <reportsDirectories>${project.build.directory}/renjin-test-reports</reportsDirectories>
           <linkXRef>false</linkXRef>
         </configuration>
         <executions>
@@ -194,3 +195,70 @@ Add something like the following to your maven pom:
         </executions>
     </plugin>
 ````      
+
+# Executing both hamcrest and testthat tests
+If you have both in one project you need to add an additional execution target
+```xml   
+<plugin>
+<groupId>se.alipsa</groupId>
+<artifactId>renjin-test-maven-plugin</artifactId>
+<version>1.3</version>
+<executions>
+  <execution>
+    <phase>test</phase>
+    <id>testthat</id>
+    <goals>
+      <goal>testR</goal>
+    </goals>
+    <configuration>
+      <testFailureIgnore>true</testFailureIgnore>
+      <testSourceDirectory>${project.basedir}/tests</testSourceDirectory>
+    </configuration>
+  </execution>
+  <execution>
+    <id>hamcrest</id>
+    <phase>test</phase>
+    <goals>
+      <goal>testR</goal>
+    </goals>
+    <configuration>
+      <testFailureIgnore>true</testFailureIgnore>
+      <testSourceDirectory>${project.basedir}/src/test/R</testSourceDirectory>
+    </configuration>
+  </execution>
+</executions>
+<dependencies>
+  <dependency>
+    <groupId>org.renjin</groupId>
+    <artifactId>renjin-script-engine</artifactId>
+    <version>${renjin.version}</version>
+    <exclusions>
+      <exclusion>
+        <groupId>commons-logging</groupId>
+        <artifactId>commons-logging</artifactId>
+      </exclusion>
+    </exclusions>
+  </dependency>
+  <dependency>
+    <groupId>org.renjin</groupId>
+    <artifactId>hamcrest</artifactId>
+    <version>${renjin.version}</version>
+  </dependency>
+  <dependency>
+    <groupId>org.renjin.cran</groupId>
+    <artifactId>testthat</artifactId>
+    <version>2.1.1-b2</version>
+  </dependency>
+  <dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-log4j12</artifactId>
+    <version>1.7.30</version>
+  </dependency>
+  <dependency>
+    <groupId>org.slf4j</groupId>
+    <artifactId>jcl-over-slf4j</artifactId>
+    <version>1.7.30</version>
+  </dependency>         
+</dependencies>
+</plugin>
+``` 

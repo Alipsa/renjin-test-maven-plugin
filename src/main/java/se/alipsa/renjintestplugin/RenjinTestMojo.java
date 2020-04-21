@@ -1,4 +1,4 @@
-package se.alipsa.renjinhamcrestplugin;
+package se.alipsa.renjintestplugin;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.vfs2.FileSystemException;
@@ -29,20 +29,20 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
 
-import static se.alipsa.renjinhamcrestplugin.TestResultPrinter.formatMessage;
+import static se.alipsa.renjintestplugin.TestResultPrinter.formatMessage;
 
 /**
- * Goal which runs Renjin Hamcrest test.
+ * Goal which runs Renjin tests.
  */
 @Mojo(name = "testR",
     defaultPhase = LifecyclePhase.TEST,
     requiresDependencyResolution = ResolutionScope.TEST,
     requiresProject = true
 )
-public class RenjinHamcrestMojo extends AbstractMojo {
+public class RenjinTestMojo extends AbstractMojo {
 
   @Parameter(name = "reportOutputDirectory", property = "testR.reportOutputDirectory",
-      defaultValue = "${project.build.directory}/renjin-hamcrest-test-reports", required = true)
+      defaultValue = "${project.build.directory}/renjin-test-reports", required = true)
   private File reportOutputDirectory;
 
   @Parameter( defaultValue = "${project}", readonly = true )
@@ -74,7 +74,7 @@ public class RenjinHamcrestMojo extends AbstractMojo {
 
 
 
-  private Logger logger = LoggerFactory.getLogger(RenjinHamcrestMojo.class);
+  private Logger logger = LoggerFactory.getLogger(RenjinTestMojo.class);
   private ClassLoader classLoader;
   private String[] extensions = new String[]{"R", "S"};
   private List<TestResult> results;
@@ -85,7 +85,7 @@ public class RenjinHamcrestMojo extends AbstractMojo {
 
     logger.info("");
     logger.info("--------------------------------------------------------");
-    logger.info("               RENJIN HAMCREST TESTS");
+    logger.info("               RENJIN TESTS");
     logger.info("               Renjin ver: {}",RenjinVersion.getVersionName());
     logger.info("--------------------------------------------------------");
 
@@ -112,6 +112,11 @@ public class RenjinHamcrestMojo extends AbstractMojo {
     }
 
     try {
+      String[] files = testOutputDirectory.list();
+      if (testOutputDirectory.exists() && files != null && files.length > 0) {
+        logger.info("Cleaning up after previous run...");
+        FileUtils.cleanDirectory(testOutputDirectory);
+      }
       logger.info("Copying {} to {}", testSourceDirectory, testOutputDirectory);
       if (testSourceDirectory.exists()) {
         FileUtils.copyDirectory(testSourceDirectory, testOutputDirectory);
@@ -152,8 +157,13 @@ public class RenjinHamcrestMojo extends AbstractMojo {
 
     Collection<File> testFiles = FileUtils.listFiles(testOutputDirectory, extensions, true);
 
-    for (File testFile : testFiles) {
-      runTestFile(testFile);
+    Iterator<File> it = testFiles.iterator();
+    while(it.hasNext()) {
+      File testFile = it.next();
+      boolean didRun = runTestFile(testFile);
+      if (!didRun) {
+        it.remove();
+      }
     }
 
     TestResultPrinter.printResultToConsole(logger, results, testFailureIgnore, testFiles);
@@ -162,6 +172,8 @@ public class RenjinHamcrestMojo extends AbstractMojo {
 
   private void runRscript(final File sourceFile) throws MojoExecutionException {
     String sourceName = sourceFile.getName();
+    // Skip testthat tests, they will be executed bythe base testthat.R
+
     logger.info("");
     logger.info("# Running {}", sourceName);
     RenjinScriptEngine engine = factory.getScriptEngine(session);
@@ -173,7 +185,10 @@ public class RenjinHamcrestMojo extends AbstractMojo {
     }
   }
 
-  private void runTestFile(final File testFile) throws MojoExecutionException {
+  private boolean runTestFile(final File testFile) throws MojoExecutionException {
+    if ("testthat".equals(testFile.getParentFile().getName())) {
+      return false;
+    }
     String testName = testFile.getAbsolutePath().substring(testOutputDirectory.getAbsolutePath().length() + 1);
     logger.info("");
     logger.info("# Running {}", testName);
@@ -201,6 +216,7 @@ public class RenjinHamcrestMojo extends AbstractMojo {
         }
       }
     }
+    return true;
   }
 
   private TestResult runTestFunction(final Context context, final File testFile, final Symbol name) {
