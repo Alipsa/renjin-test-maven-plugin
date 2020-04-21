@@ -115,7 +115,7 @@ Where ${renjin.version} is the version of Renjin you want to use e.g. 0.9.2719
     - excho "Success" after each test is successful, defaults to false
                 
 Example of overriding a few parameters:
-````
+```xml
     <build>
         <plugins>
             <plugin>
@@ -156,7 +156,8 @@ Example of overriding a few parameters:
             </plugin>
         </plugins>
     </build>
-````              
+```
+
 # Generate a test report
 You can use the surefire report plugin to generate a nice looking html report in the target/site dir.
 Add something like the following to your maven pom:
