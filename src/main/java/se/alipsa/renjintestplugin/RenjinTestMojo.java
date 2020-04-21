@@ -74,9 +74,9 @@ public class RenjinTestMojo extends AbstractMojo {
 
 
 
-  private Logger logger = LoggerFactory.getLogger(RenjinTestMojo.class);
+  private final Logger logger = LoggerFactory.getLogger(RenjinTestMojo.class);
   private ClassLoader classLoader;
-  private String[] extensions = new String[]{"R", "S"};
+  private final String[] extensions = new String[]{"R", "S"};
   private List<TestResult> results;
   private RenjinScriptEngineFactory factory;
   private Session session;
@@ -172,10 +172,9 @@ public class RenjinTestMojo extends AbstractMojo {
 
   private void runRscript(final File sourceFile) throws MojoExecutionException {
     String sourceName = sourceFile.getName();
-    // Skip testthat tests, they will be executed bythe base testthat.R
 
     logger.info("");
-    logger.info("# Running {}", sourceName);
+    logger.info("# Running src script {}", sourceName);
     RenjinScriptEngine engine = factory.getScriptEngine(session);
     try {
       engine.getSession().setWorkingDirectory(sourceFile.getParentFile());
@@ -186,9 +185,11 @@ public class RenjinTestMojo extends AbstractMojo {
   }
 
   private boolean runTestFile(final File testFile) throws MojoExecutionException {
+    // Skip testthat tests, they will be executed by the base testthat.R
     if ("testthat".equals(testFile.getParentFile().getName())) {
       return false;
     }
+
     String testName = testFile.getAbsolutePath().substring(testOutputDirectory.getAbsolutePath().length() + 1);
     logger.info("");
     logger.info("# Running {}", testName);
@@ -200,6 +201,7 @@ public class RenjinTestMojo extends AbstractMojo {
     }
 
     RenjinScriptEngine engine = factory.getScriptEngine(session);
+
     // First run any test that are not defined as functions
     TestResult result = runTest(testFile, engine);
     results.add(result);
@@ -213,6 +215,11 @@ public class RenjinTestMojo extends AbstractMojo {
           Context context = session.getTopLevelContext();
           result = runTestFunction(context, testFile, name);
           results.add(result);
+          try {
+            engine.eval("rm(" + name.getPrintName().trim() + ")");
+          } catch (ScriptException e) {
+            throw new MojoExecutionException("Failed to remove test method after execution", e);
+          }
         }
       }
     }
@@ -256,8 +263,10 @@ public class RenjinTestMojo extends AbstractMojo {
 
   private TestResult runTest(final File testFile, final RenjinScriptEngine engine) {
     TestResult result = new TestResult(testFile);
+    String methodName = testFile.getName();
+    methodName = methodName.substring(0, methodName.lastIndexOf("."));
     result.setStartTime(System.currentTimeMillis());
-    result.setTestMethod("()");
+    result.setTestMethod(methodName + "()");
     String issue;
     Exception exception;
     String testName = testFile.getName();
