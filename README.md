@@ -100,7 +100,7 @@ Where ${renjin.version} is the version of Renjin you want to use e.g. 0.9.2719
 
 ### Configuration
 - reportOutputDirectory 
-    - where the test logs will be, default to "${project.build.directory}/renjin-hamcrest-test-reports"
+    - where the test logs will be, default to "${project.build.directory}/renjin-test-reports"
 - testSourceDirectory 
     - where the test sources reside, defaults to "${project.basedir}/src/test/R
 - testOutputDirectory
