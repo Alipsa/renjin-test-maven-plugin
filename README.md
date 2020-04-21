@@ -167,7 +167,7 @@ Add something like the following to your maven pom:
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>3.0.0-M3</version>
+        <version>3.0.0-M4</version>
         <configuration>
           <title>R Tests Report</title>
           <outputName>test-report</outputName>
@@ -204,8 +204,21 @@ Add something like the following to your maven pom:
 ```      
 Then run `mvn clean test site` or similar to generate the report
 
+# Testthat support
+This plugin was originally completely targeted for hamcrest but I noticed that
+adding some level of support for testthat was easy so I decided to make this a 
+a renjin test plugin instead and add support for testthat.
+
+Testthat support is somewhat limited at this point. Basically i the plugin detects 
+the testthat structure it will execute only the testthat.R file and leave it to the 
+testthat package to handle. Since that is the case the reporting will not look wonderful - 
+the plugin will think that only one testfile was executed. But the reason for this is that
+users might put all sorts of thing in the testthat.R file needed for bootstrapping everything
+so either execute this file only or run all the tests twice and have a nice report but terrible 
+console output and unnecessary test executions. 
+  
 # Executing both hamcrest and testthat tests
-If you have both in one project you need to add an additional execution target
+If you have both in one project you need to add an additional execution target:
 ```xml   
 <plugin>
 <groupId>se.alipsa</groupId>
