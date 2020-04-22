@@ -161,6 +161,7 @@ public class RenjinTestMojo extends AbstractMojo {
     while(it.hasNext()) {
       File testFile = it.next();
       boolean didRun = runTestFile(testFile);
+      // We should not report on tests that did not run
       if (!didRun) {
         it.remove();
       }
