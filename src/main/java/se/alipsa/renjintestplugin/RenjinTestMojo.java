@@ -76,7 +76,7 @@ public class RenjinTestMojo extends AbstractMojo {
 
   private final Logger logger = LoggerFactory.getLogger(RenjinTestMojo.class);
   private ClassLoader classLoader;
-  private final String[] extensions = new String[]{"R", "S"};
+  private final String[] extensions = new String[]{"R", "r", "S", "s"};
   private List<TestResult> results;
   private RenjinScriptEngineFactory factory;
   private Session session;
@@ -115,7 +115,7 @@ public class RenjinTestMojo extends AbstractMojo {
       String[] files = testOutputDirectory.list();
       if (testOutputDirectory.exists() && files != null && files.length > 0) {
         logger.info("Cleaning up after previous run...");
-        FileUtils.cleanDirectory(testOutputDirectory);
+        FileUtils.listFiles(testOutputDirectory, extensions, true).forEach(File::delete);
       }
       logger.info("Copying {} to {}", testSourceDirectory, testOutputDirectory);
       if (testSourceDirectory.exists()) {
