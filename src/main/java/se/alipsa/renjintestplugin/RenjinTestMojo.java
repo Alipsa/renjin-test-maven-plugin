@@ -1,6 +1,10 @@
 package se.alipsa.renjintestplugin;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
@@ -51,6 +55,10 @@ public class RenjinTestMojo extends AbstractMojo {
   @Parameter(name = "testSourceDirectory", property = "testR.testSourceDirectory",
       defaultValue = "${project.basedir}/src/test/R", required = true)
   private File testSourceDirectory;
+
+  @Parameter(name = "testResourceDirectory", property = "testR.testResourceDirectory",
+      defaultValue = "${project.basedir}/src/test/resources")
+  private File testResourceDirectory;
 
   @Parameter(name = "testOutputDirectory", property = "testR.testOutputDirectory",
       defaultValue = "${project.build.testOutputDirectory}", required = true)
@@ -116,6 +124,19 @@ public class RenjinTestMojo extends AbstractMojo {
       if (testOutputDirectory.exists() && files != null && files.length > 0) {
         logger.info("Cleaning up after previous run...");
         FileUtils.listFiles(testOutputDirectory, extensions, true).forEach(File::delete);
+      }
+      // If there was R files in the test resource dir,
+      // they would have been deleted in the cleanup above so we need to restore
+      if (testResourceDirectory != null && testResourceDirectory.exists()) {
+        try {
+          logger.debug("copy R files from resources back, testResourceDirectory = {}, testOutputDirectory = {}",
+              testResourceDirectory, testOutputDirectory);
+          IOFileFilter suffixFilter = new SuffixFileFilter(extensions);
+          FileFilter filter = FileFilterUtils.or(DirectoryFileFilter.DIRECTORY, suffixFilter);
+          FileUtils.copyDirectory(testResourceDirectory, testOutputDirectory, filter);
+        } catch (IOException e) {
+          throw new MojoExecutionException("Failed to copy files from " + testResourceDirectory + " to " + testOutputDirectory, e);
+        }
       }
       logger.info("Copying {} to {}", testSourceDirectory, testOutputDirectory);
       if (testSourceDirectory.exists()) {
