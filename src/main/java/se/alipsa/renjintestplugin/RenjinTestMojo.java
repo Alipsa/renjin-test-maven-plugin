@@ -90,7 +90,10 @@ public class RenjinTestMojo extends AbstractMojo {
   private Session session;
 
   public void execute() throws MojoExecutionException, MojoFailureException {
-
+    if (isSkipTests()) {
+      logger.info("Renjin Tests are skipped");
+      return;
+    }
     logger.info("");
     logger.info("--------------------------------------------------------");
     logger.info("               RENJIN TESTS");
@@ -369,7 +372,9 @@ public class RenjinTestMojo extends AbstractMojo {
   }
 
   public boolean isSkipTests() {
-    return skipTests;
+    boolean syspropSkip = System.getProperty("skipTests") != null
+                          && !System.getProperty("skipTests").equalsIgnoreCase("false");
+    return skipTests || syspropSkip;
   }
 
   public void setSkipTests(boolean skipTests) {
