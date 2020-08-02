@@ -112,6 +112,8 @@ Where ${renjin.version} is the version of Renjin you want to use e.g. 0.9.2719
     - where the test logs will be, default to "${project.build.directory}/renjin-test-reports"
 - testSourceDirectory 
     - where the test sources reside, defaults to "${project.basedir}/src/test/R
+- testResourceDirectory
+    - where the test resources reside, defaults to "${project.basedir}/src/test/resources"   
 - testOutputDirectory
     - where the tests will be executed from, defaults to "${project.build.testOutputDirectory}"   
 - skipTests
