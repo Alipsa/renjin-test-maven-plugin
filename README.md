@@ -1,11 +1,20 @@
-# renjin-hamcrest-maven-plugin
+# renjin-test-maven-plugin
+Previously called renjin-hamcrest-maven-plugin.
 A maven plugin to execute R tests using the Renjin ScriptEngine
+
+It executes R Hamcrest and/or Testthat test located in src/test/R dir per default.
+
+Simple example test:
+```r
+library(hamcrest)
+
+test.successTest <- function() {
+  print("running success test")
+  assertTrue(TRUE)
+}
+```
 See [Using the hamcrest package to write unit tests](http://docs.renjin.org/en/latest/writing-renjin-extensions.html#using-the-hamcrest-package-to-write-unit-tests)
 for more info about Renjin Hamcrest.
-
-
-It executes R Hamcrest test located in src/test/R dir per default.
-Testthat tests are also supported. 
 
 In some regards it is not as advanced as the test plugin in the renjin-maven-plugin e.g.
 tests are not forked and hence slightly slower; also a severely misbehaving test could crash the build but
@@ -13,14 +22,14 @@ it does provide more developer friendly output saving you from having to analyze
 in the test result files. Also print() in the test will write to the console just like a
 junit test would do. 
 
-To use it add the following to your maven build plugins section:
+To use it, add the following to your maven build plugins section:
 
 ```xml
 <plugins>
   <plugin>
     <groupId>se.alipsa</groupId>
     <artifactId>renjin-test-maven-plugin</artifactId>
-    <version>1.3</version>
+    <version>1.3.3</version>
     <configuration>
       <testFailureIgnore>true</testFailureIgnore>
     </configuration>
@@ -63,7 +72,7 @@ To use the latest code, build it with `mvn clean install` and then add the plugi
     <groupId>se.alipsa</groupId>
     <artifactId>renjin-test-maven-plugin</artifactId>
     <!-- match the version with the version in the plugin pom -->
-    <version>1.3</version>
+    <version>1.3.4-SNAPSHOT</version>
     <configuration>
       <testFailureIgnore>true</testFailureIgnore>
     </configuration>
@@ -110,12 +119,12 @@ Where ${renjin.version} is the version of Renjin you want to use e.g. 0.9.2719
 - testFailureIgnore
     - Whether to halt the build on the first failure encountered or not, defaults to false
 - runSourceScriptsBeforeTests
-    -Whether to run the R scripts in src/main/R prior to running tests )useful for non-package projects), 
+    -Whether to run the R scripts in src/main/R prior to running tests (useful for non-package projects), 
     defaults for false.
 - sourceDirectory
     - where the main R scripts are, defaults to "${project.basedir}/src/main/R"
 - printSuccess
-    - excho "Success" after each test is successful, defaults to false
+    - echo "Success" after each test is successful, defaults to false
                 
 Example of overriding a few parameters:
 ```xml
