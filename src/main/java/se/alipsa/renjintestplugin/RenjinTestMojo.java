@@ -132,11 +132,12 @@ public class RenjinTestMojo extends AbstractMojo {
       // they would have been deleted in the cleanup above so we need to restore
       if (testResourceDirectory != null && testResourceDirectory.exists()) {
         try {
-          logger.debug("copy R files from resources back, testResourceDirectory = {}, testOutputDirectory = {}",
+          logger.info("Copying testResourceDirectory = {} to testOutputDirectory = {}",
               testResourceDirectory, testOutputDirectory);
-          IOFileFilter suffixFilter = new SuffixFileFilter(extensions);
-          FileFilter filter = FileFilterUtils.or(DirectoryFileFilter.DIRECTORY, suffixFilter);
-          FileUtils.copyDirectory(testResourceDirectory, testOutputDirectory, filter);
+          //IOFileFilter suffixFilter = new SuffixFileFilter(extensions);
+          //FileFilter filter = FileFilterUtils.or(DirectoryFileFilter.DIRECTORY, suffixFilter);
+          //FileUtils.copyDirectory(testResourceDirectory, testOutputDirectory, filter);
+          FileUtils.copyDirectory(testResourceDirectory, testOutputDirectory);
         } catch (IOException e) {
           throw new MojoExecutionException("Failed to copy files from " + testResourceDirectory + " to " + testOutputDirectory, e);
         }
