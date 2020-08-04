@@ -297,3 +297,38 @@ If you have both in one project you need to add an additional execution target:
 </dependencies>
 </plugin>
 ``` 
+
+# Version history
+
+### 1.3.4
+- copy full content of testResourceDirectory
+
+### 1.3.3
+- Minor fix: honor the -DskipTest as well as true property.
+
+### 1.3.2
+- fix bug where R files in test/resources was deleted from test-classes output dir. 
+- Bump up ioutils version.
+
+### 1.3.1
+- Fix bug in the cleanup that was deleting everything which prevents java tests from working. Now only removes R and S files
+
+### 1.3
+- Added basic support for testthat.
+- Renamed artifact to reflect change of purpose.
+- Enhanced docs.
+
+### 1.2
+- move session creation to after classloader has been configured
+- set working dir for src R scripts to where the script is located
+- enable execution of src R code prior to tests to support non-package testing scenarios.
+- make logging implementation classes provide
+- skip execution if no test files found
+- remove dependency on renjin core.
+- bumped up dependency versions, fix failure if no R test sources exists
+
+### 1.1
+- Minor fixes such as removing some printlines and adding total time to console output.
+
+### 1.0-final
+initial release
