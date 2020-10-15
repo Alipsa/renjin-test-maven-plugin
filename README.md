@@ -300,6 +300,10 @@ If you have both in one project you need to add an additional execution target:
 
 # Version history
 
+### 1.3.5
+- upgrade junit
+- add auto codescan
+
 ### 1.3.4
 - copy full content of testResourceDirectory
 
