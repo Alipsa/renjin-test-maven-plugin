@@ -301,7 +301,7 @@ If you have both in one project you need to add an additional execution target:
 # Version history
 
 ### 1.3.5
-- upgrade junit
+- upgrade junit, commons-io, commons-lang3 and maven plugins
 - add auto codescan
 
 ### 1.3.4
