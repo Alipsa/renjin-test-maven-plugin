@@ -29,7 +29,7 @@ To use it, add the following to your maven build plugins section:
   <plugin>
     <groupId>se.alipsa</groupId>
     <artifactId>renjin-test-maven-plugin</artifactId>
-    <version>1.3.3</version>
+    <version>1.3.5</version>
     <configuration>
       <testFailureIgnore>true</testFailureIgnore>
     </configuration>
@@ -72,7 +72,7 @@ To use the latest code, build it with `mvn clean install` and then add the plugi
     <groupId>se.alipsa</groupId>
     <artifactId>renjin-test-maven-plugin</artifactId>
     <!-- match the version with the version in the plugin pom -->
-    <version>1.3.4-SNAPSHOT</version>
+    <version>1.3.5</version>
     <configuration>
       <testFailureIgnore>true</testFailureIgnore>
     </configuration>
@@ -135,7 +135,7 @@ Example of overriding a few parameters:
             <plugin>
                 <groupId>se.alipsa</groupId>
                 <artifactId>renjin-test-maven-plugin</artifactId>
-                <version>1.3</version>
+                <version>1.3.5</version>
                 <configuration>
                     <outputDirectory>target/test-harness/project-to-test</outputDirectory>
                     <testSourceDirectory>R/test</testSourceDirectory>
@@ -181,7 +181,7 @@ Add something like the following to your maven pom:
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>3.0.0-M4</version>
+        <version>3.0.0-M5</version>
         <configuration>
           <title>R Tests Report</title>
           <outputName>test-report</outputName>
@@ -201,7 +201,7 @@ Add something like the following to your maven pom:
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>3.7.1</version>
+        <version>3.9.1</version>
         <configuration>
           <generateReports>false</generateReports>
         </configuration>
@@ -237,7 +237,7 @@ If you have both in one project you need to add an additional execution target:
 <plugin>
 <groupId>se.alipsa</groupId>
 <artifactId>renjin-test-maven-plugin</artifactId>
-<version>1.3</version>
+<version>1.3.5</version>
 <executions>
   <execution>
     <phase>test</phase>
