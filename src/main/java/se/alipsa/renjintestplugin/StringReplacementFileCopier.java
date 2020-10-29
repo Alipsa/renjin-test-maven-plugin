@@ -15,6 +15,12 @@ public class StringReplacementFileCopier {
   /**
    * Copy all files in a directory to the target directory
    * If there is a filter match for a file then matching string will be replaced otherwise the file will be copied as is
+   *
+   * @param sourceDirectory the source directory
+   * @param targetDirectory the target directory
+   * @param filter a FileFilter for files where content should be replcaed
+   * @param replaceStringsWhenCopy a Properties map where key=target to be replaced and value=the replacement value
+   * @throws IOException if some file reading or writing operation failed
    */
   public static void copyDirectory(File sourceDirectory, File targetDirectory, FileFilter filter, Properties replaceStringsWhenCopy) throws IOException {
     if (sourceDirectory == null) {
