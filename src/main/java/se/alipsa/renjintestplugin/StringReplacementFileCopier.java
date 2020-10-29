@@ -1,16 +1,19 @@
 package se.alipsa.renjintestplugin;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Map;
 import java.util.Properties;
 
 public class StringReplacementFileCopier {
+
+  private static final Logger logger = LoggerFactory.getLogger(StringReplacementFileCopier.class);
 
   /**
    * Copy all files in a directory to the target directory
@@ -28,21 +31,33 @@ public class StringReplacementFileCopier {
     }
     File[] sourceFiles = sourceDirectory.listFiles();
     if (sourceFiles == null) {
-      // No files here, nothing to do
+      logger.info("No files in {}, nothing to do", sourceDirectory);
       return;
     }
+    if (!targetDirectory.exists()) {
+      targetDirectory.mkdirs();
+    }
     for (File file : sourceFiles) {
-      if (filter.accept(file)) {
-        StringBuilder sb = new StringBuilder();
-        Files.lines(file.toPath(), StandardCharsets.UTF_8).forEach(line -> {
-          for (String key : replaceStringsWhenCopy.stringPropertyNames()) {
-            String modLine = line.replaceAll(key, replaceStringsWhenCopy.getProperty(key));
-            sb.append(modLine).append(System.lineSeparator());
-          }
-        });
-        FileUtils.write(new File(targetDirectory, file.getName()), sb.toString(), StandardCharsets.UTF_8);
+      if (file.isDirectory()) {
+        File targetDir = new File(targetDirectory, file.getName());
+        copyDirectory(file, targetDir, filter, replaceStringsWhenCopy);
       } else {
-        FileUtils.copyFileToDirectory(file, targetDirectory);
+        //logger.info("copying {} to {}", file, targetDirectory);
+        if (filter.accept(file)) {
+          StringBuilder sb = new StringBuilder();
+          Files.lines(file.toPath(), StandardCharsets.UTF_8).forEach(line -> {
+            for (String key : replaceStringsWhenCopy.stringPropertyNames()) {
+              if (line.contains(key)) {
+                logger.debug("Found {} in file {}, changing it to {}", key, file, replaceStringsWhenCopy.getProperty(key));
+              }
+              String modLine = line.replace(key, replaceStringsWhenCopy.getProperty(key));
+              sb.append(modLine).append(System.lineSeparator());
+            }
+          });
+          FileUtils.write(new File(targetDirectory, file.getName()), sb.toString(), StandardCharsets.UTF_8);
+        } else {
+          FileUtils.copyFileToDirectory(file, targetDirectory);
+        }
       }
     }
   }

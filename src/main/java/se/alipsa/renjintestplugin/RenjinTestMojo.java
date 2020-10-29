@@ -133,7 +133,7 @@ public class RenjinTestMojo extends AbstractMojo {
         FileUtils.listFiles(testOutputDirectory, extensions, true).forEach(File::delete);
       }
 
-
+      logger.debug("replaceStringsWhenCopy = {}", replaceStringsWhenCopy);
       // If there was R files in the test resource dir,
       // they would have been deleted in the cleanup above so we need to restore
       IOFileFilter suffixFilter = new SuffixFileFilter(extensions);
@@ -155,7 +155,7 @@ public class RenjinTestMojo extends AbstractMojo {
       logger.info("Copying {} to {}", testSourceDirectory, testOutputDirectory);
       if (testSourceDirectory.exists()) {
         if (replaceStringsWhenCopy != null && replaceStringsWhenCopy.size() > 0) {
-          StringReplacementFileCopier.copyDirectory(testResourceDirectory, testOutputDirectory, filter, replaceStringsWhenCopy);
+          StringReplacementFileCopier.copyDirectory(testSourceDirectory, testOutputDirectory, filter, replaceStringsWhenCopy);
         } else {
           FileUtils.copyDirectory(testSourceDirectory, testOutputDirectory);
         }
