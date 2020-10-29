@@ -20,7 +20,7 @@ To use it add the following to your maven build plugins section:
   <plugin>
     <groupId>se.alipsa</groupId>
     <artifactId>renjin-test-maven-plugin</artifactId>
-    <version>1.3</version>
+    <version>1.3.6</version>
     <configuration>
       <testFailureIgnore>true</testFailureIgnore>
     </configuration>
@@ -63,7 +63,7 @@ To use the latest code, build it with `mvn clean install` and then add the plugi
     <groupId>se.alipsa</groupId>
     <artifactId>renjin-test-maven-plugin</artifactId>
     <!-- match the version with the version in the plugin pom -->
-    <version>1.3</version>
+    <version>1.3.6</version>
     <configuration>
       <testFailureIgnore>true</testFailureIgnore>
     </configuration>
@@ -115,8 +115,13 @@ Where ${renjin.version} is the version of Renjin you want to use e.g. 0.9.2719
 - sourceDirectory
     - where the main R scripts are, defaults to "${project.basedir}/src/main/R"
 - printSuccess
-    - excho "Success" after each test is successful, defaults to false
-                
+    - echo "Success" after each test is successful, defaults to false
+- replaceStringsWhenCopy
+    - replace string occurrences in the R scripts when they are copied from the src to target
+    this is useful if you created a plugin to GNU R and Renjin so you can replace the library name
+    in the tests to include the group name (see example below). You can have as many <property></property> 
+    blocks as you want.
+                   
 Example of overriding a few parameters:
 ```xml
     <build>
@@ -124,11 +129,17 @@ Example of overriding a few parameters:
             <plugin>
                 <groupId>se.alipsa</groupId>
                 <artifactId>renjin-test-maven-plugin</artifactId>
-                <version>1.3</version>
+                <version>1.3.6</version>
                 <configuration>
                     <outputDirectory>target/test-harness/project-to-test</outputDirectory>
                     <testSourceDirectory>R/test</testSourceDirectory>
                     <testFailureIgnore>true</testFailureIgnore>
+                    <replaceStringsWhenCopy>
+                      <property>
+                        <name>library('xmlr')></name>
+                        <value>library('se.alipsa:xmlr')</value>
+                      </property>
+                    </replaceStringsWhenCopy>
                 </configuration>
                 <executions>
                   <execution>
@@ -226,7 +237,7 @@ If you have both in one project you need to add an additional execution target:
 <plugin>
 <groupId>se.alipsa</groupId>
 <artifactId>renjin-test-maven-plugin</artifactId>
-<version>1.3</version>
+<version>1.3.6</version>
 <executions>
   <execution>
     <phase>test</phase>

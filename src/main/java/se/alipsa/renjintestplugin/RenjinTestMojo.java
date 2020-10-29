@@ -80,7 +80,11 @@ public class RenjinTestMojo extends AbstractMojo {
   @Parameter(name = "printSuccess", property = "testR.printSuccess", defaultValue = "false")
   private boolean printSuccess;
 
-
+  /**
+   * key value pairs e.g. library('xmlr')
+   */
+  @Parameter(name = "replaceStringsWhenCopy", property = "testR.replaceStringsWhenCopy")
+  private Properties replaceStringsWhenCopy;
 
   private final Logger logger = LoggerFactory.getLogger(RenjinTestMojo.class);
   private ClassLoader classLoader;
@@ -128,26 +132,38 @@ public class RenjinTestMojo extends AbstractMojo {
         logger.info("Cleaning up after previous run...");
         FileUtils.listFiles(testOutputDirectory, extensions, true).forEach(File::delete);
       }
+
+
       // If there was R files in the test resource dir,
       // they would have been deleted in the cleanup above so we need to restore
+      IOFileFilter suffixFilter = new SuffixFileFilter(extensions);
+      FileFilter filter = FileFilterUtils.or(DirectoryFileFilter.DIRECTORY, suffixFilter);
+
       if (testResourceDirectory != null && testResourceDirectory.exists()) {
         try {
           logger.debug("copy R files from resources back, testResourceDirectory = {}, testOutputDirectory = {}",
               testResourceDirectory, testOutputDirectory);
-          IOFileFilter suffixFilter = new SuffixFileFilter(extensions);
-          FileFilter filter = FileFilterUtils.or(DirectoryFileFilter.DIRECTORY, suffixFilter);
-          FileUtils.copyDirectory(testResourceDirectory, testOutputDirectory, filter);
+          if (replaceStringsWhenCopy != null && replaceStringsWhenCopy.size() > 0) {
+            StringReplacementFileCopier.copyDirectory(testResourceDirectory, testOutputDirectory, filter, replaceStringsWhenCopy);
+          } else {
+            FileUtils.copyDirectory(testResourceDirectory, testOutputDirectory, filter);
+          }
         } catch (IOException e) {
           throw new MojoExecutionException("Failed to copy files from " + testResourceDirectory + " to " + testOutputDirectory, e);
         }
       }
       logger.info("Copying {} to {}", testSourceDirectory, testOutputDirectory);
       if (testSourceDirectory.exists()) {
-        FileUtils.copyDirectory(testSourceDirectory, testOutputDirectory);
+        if (replaceStringsWhenCopy != null && replaceStringsWhenCopy.size() > 0) {
+          StringReplacementFileCopier.copyDirectory(testResourceDirectory, testOutputDirectory, filter, replaceStringsWhenCopy);
+        } else {
+          FileUtils.copyDirectory(testSourceDirectory, testOutputDirectory);
+        }
       } else {
         logger.info("No test files found in test source directory {}", testSourceDirectory);
         return;
       }
+
     } catch (IOException e) {
       throw new MojoExecutionException("Failed to copy files from " + testSourceDirectory + " to " + testOutputDirectory, e);
     }
