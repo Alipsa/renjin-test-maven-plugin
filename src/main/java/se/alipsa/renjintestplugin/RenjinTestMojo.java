@@ -141,7 +141,7 @@ public class RenjinTestMojo extends AbstractMojo {
 
       if (testResourceDirectory != null && testResourceDirectory.exists()) {
         try {
-          logger.debug("copy R files from resources back, testResourceDirectory = {}, testOutputDirectory = {}",
+          logger.info("Copying testResourceDirectory = {} to testOutputDirectory = {}",
               testResourceDirectory, testOutputDirectory);
           if (replaceStringsWhenCopy != null && replaceStringsWhenCopy.size() > 0) {
             StringReplacementFileCopier.copyDirectory(testResourceDirectory, testOutputDirectory, filter, replaceStringsWhenCopy);

@@ -1,5 +1,18 @@
-# renjin-hamcrest-maven-plugin
+# renjin-test-maven-plugin
+Previously called renjin-hamcrest-maven-plugin.
 A maven plugin to execute R tests using the Renjin ScriptEngine
+
+It executes R Hamcrest and/or Testthat test located in src/test/R dir per default.
+
+Simple example test:
+```r
+library(hamcrest)
+
+test.successTest <- function() {
+  print("running success test")
+  assertTrue(TRUE)
+}
+```
 See [Using the hamcrest package to write unit tests](http://docs.renjin.org/en/latest/writing-renjin-extensions.html#using-the-hamcrest-package-to-write-unit-tests)
 for more info about Renjin Hamcrest.
 
@@ -13,7 +26,7 @@ it does provide more developer friendly output saving you from having to analyze
 in the test result files. Also print() in the test will write to the console just like a
 junit test would do. 
 
-To use it add the following to your maven build plugins section:
+To use it, add the following to your maven build plugins section:
 
 ```xml
 <plugins>
@@ -103,6 +116,8 @@ Where ${renjin.version} is the version of Renjin you want to use e.g. 0.9.2719
     - where the test logs will be, default to "${project.build.directory}/renjin-test-reports"
 - testSourceDirectory 
     - where the test sources reside, defaults to "${project.basedir}/src/test/R
+- testResourceDirectory
+    - where the test resources reside, defaults to "${project.basedir}/src/test/resources"   
 - testOutputDirectory
     - where the tests will be executed from, defaults to "${project.build.testOutputDirectory}"   
 - skipTests
@@ -110,7 +125,7 @@ Where ${renjin.version} is the version of Renjin you want to use e.g. 0.9.2719
 - testFailureIgnore
     - Whether to halt the build on the first failure encountered or not, defaults to false
 - runSourceScriptsBeforeTests
-    -Whether to run the R scripts in src/main/R prior to running tests )useful for non-package projects), 
+    -Whether to run the R scripts in src/main/R prior to running tests (useful for non-package projects), 
     defaults for false.
 - sourceDirectory
     - where the main R scripts are, defaults to "${project.basedir}/src/main/R"
@@ -181,7 +196,7 @@ Add something like the following to your maven pom:
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>3.0.0-M4</version>
+        <version>3.0.0-M5</version>
         <configuration>
           <title>R Tests Report</title>
           <outputName>test-report</outputName>
@@ -201,7 +216,7 @@ Add something like the following to your maven pom:
     <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>3.7.1</version>
+        <version>3.9.1</version>
         <configuration>
           <generateReports>false</generateReports>
         </configuration>
@@ -297,3 +312,42 @@ If you have both in one project you need to add an additional execution target:
 </dependencies>
 </plugin>
 ``` 
+
+# Version history
+
+### 1.3.5
+- upgrade junit, commons-io, commons-lang3 and maven plugins
+- add auto codescan
+
+### 1.3.4
+- copy full content of testResourceDirectory
+
+### 1.3.3
+- Minor fix: honor the -DskipTest as well as true property.
+
+### 1.3.2
+- fix bug where R files in test/resources was deleted from test-classes output dir. 
+- Bump up ioutils version.
+
+### 1.3.1
+- Fix bug in the cleanup that was deleting everything which prevents java tests from working. Now only removes R and S files
+
+### 1.3
+- Added basic support for testthat.
+- Renamed artifact to reflect change of purpose.
+- Enhanced docs.
+
+### 1.2
+- move session creation to after classloader has been configured
+- set working dir for src R scripts to where the script is located
+- enable execution of src R code prior to tests to support non-package testing scenarios.
+- make logging implementation classes provide
+- skip execution if no test files found
+- remove dependency on renjin core.
+- bumped up dependency versions, fix failure if no R test sources exists
+
+### 1.1
+- Minor fixes such as removing some printlines and adding total time to console output.
+
+### 1.0-final
+initial release
