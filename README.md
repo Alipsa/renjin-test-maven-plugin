@@ -133,8 +133,10 @@ Where ${renjin.version} is the version of Renjin you want to use e.g. 0.9.2719
     - echo "Success" after each test is successful, defaults to false
 - replaceStringsWhenCopy
     - replace string occurrences in the R scripts when they are copied from the src to target
-    this is useful if you created a plugin to GNU R and Renjin so you can replace the library name
-    in the tests to include the group name (see example below). You can have as many <property></property> 
+    this is useful if you created a plugin where the same code should work in both GNU R and Renjin 
+    but you want to publish the renjin version with a group name you own instead of org.renjin.cran
+    and hence you need to change the call to library name in your tests
+    to include the group name (see example below). You can have as many <property></property> 
     blocks as you want.
                    
 Example of overriding a few parameters:
@@ -151,7 +153,7 @@ Example of overriding a few parameters:
                     <testFailureIgnore>true</testFailureIgnore>
                     <replaceStringsWhenCopy>
                       <property>
-                        <name>library('xmlr')></name>
+                        <name>library(xmlr)</name>
                         <value>library('se.alipsa:xmlr')</value>
                       </property>
                     </replaceStringsWhenCopy>
